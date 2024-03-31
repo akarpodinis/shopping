@@ -1,0 +1,41 @@
+services:
+    shopping:
+        image: shopping:latest
+        container_name: shopping
+        build: .
+        depends_on:
+            - db
+        environment:
+            DATABASE_URL: postgres://shopping:password@db:5432/shopping
+        ports:
+            - "80:80"
+        volumes:
+            - "$PWD/:/app"
+        command: ["--reload"]
+
+    migrate-database:
+        image: shopping:latest
+        container_name: migrate-database
+        environment:
+            DATABASE_URL: postgres://shopping:password@db:5432/shopping
+        depends_on:
+            db:
+                condition: service_healthy
+        restart: "no"
+        entrypoint: ["bash", "-c", "alembic upgrade head"]
+
+    db:
+        container_name: db
+        image: postgres:16.2-bullseye
+        environment:
+            POSTGRES_DB: shopping
+            POSTGRES_USER: shopping
+            POSTGRES_PASSWORD: password
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U shopping -d shopping -p 5432"]
+            start_period: 3s
+            interval: 5s
+            timeout: 3s
+            retries: 3
+        ports:
+            - "54320:5432"
