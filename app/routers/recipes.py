@@ -1,10 +1,11 @@
 from uuid import UUID
 from fastapi import APIRouter, Request, Response
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.routers.responses import UUIDJSONResponse
 from app.infra.ingredients import names_and_ids
-from app.infra.recipes import all, one
+from app.infra.recipes import all, insert, one, DuplicateRecipeError, RecipeDoesNotExistError
 
 router = APIRouter(prefix='/recipes')
 
@@ -40,6 +41,45 @@ def get_one(id: str) -> Response:
     except ValueError:
         return Response(content='id in path should be a UUID', status_code=422)
 
-    recipe = one(id)
-    return UUIDJSONResponse(content=recipe if recipe else None,
-                            status_code=200 if recipe else 404)
+    try:
+        recipe = one(id)
+    except RecipeDoesNotExistError:
+        return Response(status_code=404)
+    else:
+        return UUIDJSONResponse(content=recipe, status_code=200)
+
+
+@router.post('')
+async def new_recipe(request: Request) -> Response:
+    form_dict = await request.form()
+
+    # Find and validate the recipe name
+    try:
+        name = form_dict['name']
+        name = name.strip()
+        if not name:
+            return Response(content='Name is required', status_code=422)
+    except KeyError:
+        return Response(content='Name is required', status_code=422)
+
+    # Find and validate the amounts for checked checkboxes
+    # Magic '||' to get IDs.  The template has IDs set in the name with the form
+    # "some-uuid||selected" for checkboxes and "some-uuid||amount" for amounts
+
+    try:
+        selected_ids = [
+            UUID(key.split('||')[0]) for key in form_dict.keys() if 'on' in form_dict[key]
+        ]
+        amounts = []
+        for selected_id in selected_ids:
+            try:
+                amount = int(form_dict[f'{selected_id}||amount'])
+                amounts.append((selected_id, amount))
+            except ValueError as e:
+                return Response(content=f'Amount {e} should be an integer', status_code=422)
+
+        inserted = insert(name, amounts)
+    except DuplicateRecipeError:
+        return Response(content=f'Duplicate recipe with name {name}', status_code=409)
+
+    return RedirectResponse(f'/recipes/{inserted}', status_code=303)
