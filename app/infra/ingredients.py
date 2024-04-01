@@ -51,6 +51,17 @@ def delete(id: UUID) -> None:
         conn.commit()
 
 
+def names_and_ids() -> tuple[list[str], list[UUID]]:
+    names = []
+    ids = []
+    with engine.connect() as conn:
+        for ingredient in conn.execute(select(ingredients.c.name, ingredients.c.id)).all():
+            names.append(ingredient.name)
+            ids.append(ingredient.id)
+
+    return names, ids
+
+
 def template_configuration() -> dict[str, Any]:
     return {
         'fields': [
