@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <form action="/recipes/new", method="POST">
+      <p>Recipe name: <input type="text" name="recipe_name" required/>
+      <p></p>
+      <select name="ingredients" id="ingredients" multiple size="10" required>
+        {% for name in names %}
+        <option value="{{ids[loop.index0]}}">{{name}}</option>
+        {% endfor %}
+      </select>
+      <p></p>
+      <input type="submit" value="Add">
+    </form>
+  </body>
+</html>
