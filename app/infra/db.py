@@ -21,14 +21,16 @@ ingredients = Table(
     Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
     Column('name', String, unique=True, nullable=False),
     Column('aisle', String, nullable=False),
-    Column('stocked', Boolean, default=False)
+    Column('stocked', Boolean, default=False),
+    UniqueConstraint('name')
 )
 
 recipes = Table(
     'recipes',
     metadata,
     Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
-    Column('name', String, unique=True, nullable=False)
+    Column('name', String, unique=True, nullable=False),
+    UniqueConstraint('name')
 )
 
 ingredients_recipes = Table(
