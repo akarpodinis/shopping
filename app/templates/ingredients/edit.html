@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>    
+  <body>
+      <form action="/ingredients/{{id}}" method="POST">
+          {% for field in fields %}
+            {% if types[loop.index0] == "checkbox" %}
+            <p>{{field}}: <input type = "{{types[loop.index0]}}" name = "{{field}}" {{existing[loop.index0]}}/></p>
+            {% else %}
+            <p>{{field}}: <input type = "{{types[loop.index0]}}" name = "{{field}}" placeholder = "{{existing[loop.index0]}}"/></p>
+            {% endif %}
+          {% endfor %}
+          <input type="submit" value="Update" />
+      </form>
+  </body>
+</html>
