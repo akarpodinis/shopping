@@ -51,11 +51,11 @@ def add(name: Annotated[str, Form()],
         aisle: Annotated[str, Form()],
         stocked: Annotated[bool, Form()] = False) -> Response:
     try:
-        insert(name, aisle, stocked)
+        inserted = insert(name, aisle, stocked)
     except DuplicateIngredientError:
         return Response(content=f'Duplicate ingredient with name {name}', status_code=409)
 
-    return RedirectResponse('/ingredients', status_code=303)
+    return RedirectResponse(f'/ingredients/{inserted}', status_code=303)
 
 
 # This should be a PATCH but HTML forms don't support that method.
