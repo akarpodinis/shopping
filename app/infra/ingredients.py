@@ -25,22 +25,25 @@ class DuplicateIngredientError(Exception):
     pass
 
 
-def insert(name: str, aisle: str, stocked: bool) -> None:
+def insert(name: str, aisle: str, stocked: bool) -> UUID:
     try:
         with engine.connect() as conn:
-            conn.execute(
+            inserted = conn.execute(
                 ingredients.insert().values(
                     name=name,
                     aisle=aisle,
                     stocked=stocked
+                ).returning(
+                    ingredients.c.id
                 )
-            )
+            ).mappings().first()
             conn.commit()
     except IntegrityError as e:
         if isinstance(e.orig, UniqueViolation):
             raise DuplicateIngredientError
         else:
             raise
+    return inserted.id
 
 
 def delete(id: UUID) -> None:
