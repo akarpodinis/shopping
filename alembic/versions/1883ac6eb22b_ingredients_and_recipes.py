@@ -23,7 +23,7 @@ def upgrade():
         sa.Column('id', postgresql.UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('aisle', sa.String(), nullable=False),
-        sa.Column('stocked', sa.Boolean(), nullable=True),
+        sa.Column('stocked', sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('name')
     )
