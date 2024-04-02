@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit ingredients</title>
+</head>
+<body>
+  <ol>
+    {% for ingredient in ingredients %}
+    <li> <a href="/ingredients/{{ingredient.0}}/edit">Edit</a> Ingredient {{ingredient.1}} found in aisle {{ingredient.2}} {{ingredient.3}}</li>
+    {% endfor %}
+  </ol>
+</body>
+</html>
