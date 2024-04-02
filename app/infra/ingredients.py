@@ -62,7 +62,7 @@ def names_and_ids() -> tuple[list[str], list[UUID]]:
     return names, ids
 
 
-def template_configuration() -> dict[str, Any]:
+def new_template_configuration() -> dict[str, Any]:
     return {
         'fields': [
             ingredients.c.name.name,
@@ -76,3 +76,47 @@ def template_configuration() -> dict[str, Any]:
             'required', 'required', ''
         ]
     }
+
+
+def edit_template_configuration(id: UUID) -> dict[str, Any]:
+    ingredient = one(id)
+
+    return {
+        'id': str(id),
+        'fields': [
+            ingredients.c.name.name,
+            ingredients.c.aisle.name,
+            ingredients.c.stocked.name
+        ],
+        'types': [
+            'text', 'text', 'checkbox'
+        ],
+        'existing': [
+            ingredient['name'],
+            ingredient['aisle'],
+            'checked' if ingredient['stocked'] else ''
+        ]
+    }
+
+
+def update(id: UUID, stocked: bool, name: str = None, aisle: str = None) -> dict[str, Any]:
+    with engine.connect() as conn:
+        try:
+            values = {}
+            if name:
+                values['name'] = name
+            if aisle:
+                values['aisle'] = aisle
+            values['stocked'] = stocked
+            updated = conn.execute(
+                ingredients.update().values(**values).where(ingredients.c.id == id)
+                .returning(ingredients)
+            ).mappings().first()
+            conn.commit()
+        except IntegrityError as e:
+            if isinstance(e.orig, UniqueViolation):
+                raise DuplicateIngredientError
+            else:
+                raise
+
+        return dict(updated)
