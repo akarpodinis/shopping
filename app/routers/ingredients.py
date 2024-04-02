@@ -32,6 +32,25 @@ def new_form(request: Request):
     )
 
 
+@router.get('/list')
+def list_page(request: Request) -> Response:
+    ingredients = all()
+
+    print(ingredients)
+
+    return templates.TemplateResponse(
+        request=request,
+        name='list.html',
+        context={
+            'ingredients': [(str(ingredient['id']),
+                             ingredient['name'],
+                             ingredient['aisle'],
+                             '(stocked)' if ingredient['stocked'] else '')
+                            for ingredient in ingredients]
+        }
+    )
+
+
 @router.get('/{id}')
 def get_one(id: str) -> Response:
     try:
