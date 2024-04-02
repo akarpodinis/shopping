@@ -1,11 +1,12 @@
 from uuid import UUID
+
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.routers.responses import UUIDJSONResponse
 from app.infra.ingredients import names_and_ids
-from app.infra.recipes import all, insert, one, DuplicateRecipeError, RecipeDoesNotExistError
+from app.infra.recipes import DuplicateRecipeError, RecipeDoesNotExistError, all, insert, one
+from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/recipes')
 
