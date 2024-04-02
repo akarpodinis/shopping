@@ -4,16 +4,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-    <form action="/recipes/new", method="POST">
-      <p>Recipe name: <input type="text" name="recipe_name" required/>
-      <p></p>
-      <select name="ingredients" id="ingredients" multiple size="10" required>
-        {% for name in names %}
-        <option value="{{ids[loop.index0]}}">{{name}}</option>
-        {% endfor %}
-      </select>
-      <p></p>
-      <input type="submit" value="Add">
+    <form action="/recipes", method="POST">
+      <div> Name <input type="text" name="name"/>
+        <ul>
+            {% for name in names %}
+            <li><input type="checkbox" name="{{ids[loop.index0]}}||selected"/>{{name}}<input type="text" name="{{ids[loop.index0]}}||amount" />Amount</li>
+            {% endfor %}
+        </ul>
+      </div>
+      <div><input type="submit" value="Make"></div>
     </form>
   </body>
 </html>
