@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Lists</title>
+</head>
+<body>
+	<ol>
+        {% for list in all_lists %}
+        <li> <a href="/lists/{{list.id}}/shopping">Shopping</a> {{list.date}} </li>
+        {% endfor %}
+	</ol>
+</body>
+</html>
