@@ -44,8 +44,7 @@ class DuplicateRecipeError(Exception):
     pass
 
 
-# TODO rename to "add(...)"
-def insert(name: str, ingredients: list[tuple[UUID, int]]) -> UUID:
+def add(name: str, ingredients: list[tuple[UUID, int]]) -> UUID:
     try:
         with engine.connect() as conn:
             # Insert the base recipe record, raising if there's a duplicate name
