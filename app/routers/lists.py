@@ -13,6 +13,19 @@ router = APIRouter(prefix='/lists')
 templates = Jinja2Templates(directory='app/templates/lists')
 
 
+@router.get('/list')
+def list_lists(request: Request) -> Response:
+    all_lists = lists.all()
+
+    return templates.TemplateResponse(
+        request=request,
+        name='list.html',
+        context={
+            'all_lists': all_lists
+        }
+    )
+
+
 # Ordering matters here.  I want the router to check /ingredients/new on GET before trying to
 # figure out if the parameter is a UUID
 @router.get('/new')

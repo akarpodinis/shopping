@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func, label, or_, select
@@ -8,6 +9,13 @@ from sqlalchemy.dialects.postgresql import insert
 from app.infra.db import (
     engine, ingredients, ingredients_recipes, list_items, list_recipes, lists, recipes
 )
+
+
+def all() -> list[dict[str, Any]]:
+    with engine.connect() as conn:
+        all_lists = conn.execute(lists.select().order_by(lists.c.date.desc())).mappings().all()
+
+    return [dict(one_list) for one_list in all_lists]
 
 
 def add(date: datetime, recipe_scales: dict[UUID, float], included_ingredients: list[UUID],
