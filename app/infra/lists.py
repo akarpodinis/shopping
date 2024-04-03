@@ -6,7 +6,7 @@ from sqlalchemy import func, label, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.infra.db import (
-    engine, ingredients, ingredients_recipes, lists, list_items, list_recipes, recipes
+    engine, ingredients, ingredients_recipes, list_items, list_recipes, lists, recipes
 )
 
 
@@ -46,8 +46,9 @@ def add(date: datetime, recipe_scales: dict[UUID, float], included_ingredients: 
         order by i.aisle desc;
         """
         desired_ingredients = {}
+        resolved_ingredients = []
         for recipe in recipe_scales.keys():
-            resolved_ingredients = conn.execute(
+            resolved_ingredients += conn.execute(
                 select(
                     ingredients.c.id,
                     ingredients.c.name,

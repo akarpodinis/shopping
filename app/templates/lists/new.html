@@ -15,11 +15,6 @@
     {% for name in recipe_names %}
       <div><input type="checkbox" name="included" value="{{recipe_ids[loop.index0]}}" />{{name}}: Scale <input type="text" name="scales" value="1.0" /></div>
     {% endfor %}
-      <!-- <select name="recipes" id="recipes" multiple size="10" required>
-        {% for name in recipe_names %}
-        <option value="{{recipe_ids[loop.index0]}}">{{name}}</option>
-        {% endfor %}
-      </select> -->
     <br />
     <div><input type="submit" value="Create"></div>
   </form>

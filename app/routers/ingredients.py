@@ -64,9 +64,9 @@ def get_one(id: str) -> Response:
 
 
 @router.post('')
-def add(name: Annotated[str, Form()],
-        aisle: Annotated[str, Form()],
-        stocked: Annotated[bool, Form()] = False) -> Response:
+def new_ingredient(name: Annotated[str, Form()],
+                   aisle: Annotated[str, Form()],
+                   stocked: Annotated[bool, Form()] = False) -> Response:
     try:
         inserted = insert(name, aisle, stocked)
     except DuplicateIngredientError:

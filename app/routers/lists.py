@@ -6,7 +6,7 @@ from fastapi import APIRouter, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.infra import recipes, lists
+from app.infra import lists, recipes
 
 router = APIRouter(prefix='/lists')
 
@@ -37,10 +37,10 @@ def new_form(request: Request) -> Response:
 def add(date: Annotated[str, Form()],
         recipes: Annotated[list[str], Form()],
         scales: Annotated[list[str], Form()],
-        include_ingredients: Annotated[list[str], Form()],
-        arbitrary_names: Annotated[list[str], Form()],
-        arbitrary_aisles: Annotated[list[str], Form()],
-        arbitrary_amounts: Annotated[list[str], Form()]) -> Response:
+        include_ingredients: Annotated[list[str], Form()] = [],
+        arbitrary_names: Annotated[list[str], Form()] = [],
+        arbitrary_aisles: Annotated[list[str], Form()] = [],
+        arbitrary_amounts: Annotated[list[str], Form()] = []) -> Response:
 
     # Filter empty arbitrary rows
     arbitrary_items = []
@@ -86,7 +86,6 @@ def confirm_stocked(date: Annotated[str, Form()], included: Annotated[list[str],
 @router.get('/{id}/shopping')
 def shopping(id: str, request: Request) -> Response:
     shopping_list = lists.for_shopping(UUID(id))
-    print(shopping_list)
     return templates.TemplateResponse(
         request=request,
         name='shopping.html',
