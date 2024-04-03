@@ -36,8 +36,6 @@ def new_form(request: Request):
 def list_page(request: Request) -> Response:
     ingredients = all()
 
-    print(ingredients)
-
     return templates.TemplateResponse(
         request=request,
         name='list.html',
