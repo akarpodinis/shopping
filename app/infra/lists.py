@@ -6,7 +6,7 @@ from sqlalchemy import func, label, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.infra.db import (
-    engine, ingredients, ingredients_recipes, lists, list_items, list_recipes, recipes
+    engine, ingredients, ingredients_recipes, list_items, list_recipes, lists, recipes
 )
 
 
