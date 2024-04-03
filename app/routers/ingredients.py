@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.infra.ingredients import (
-    DuplicateIngredientError, all, delete, edit_template_configuration, insert,
+    DuplicateIngredientError, add, all, delete, edit_template_configuration,
     new_template_configuration, one, update
 )
 from app.routers.responses import UUIDJSONResponse
@@ -68,7 +68,7 @@ def new_ingredient(name: Annotated[str, Form()],
                    aisle: Annotated[str, Form()],
                    stocked: Annotated[bool, Form()] = False) -> Response:
     try:
-        inserted = insert(name, aisle, stocked)
+        inserted = add(name, aisle, stocked)
     except DuplicateIngredientError:
         return Response(content=f'Duplicate ingredient with name {name}', status_code=409)
 

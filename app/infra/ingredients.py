@@ -25,8 +25,7 @@ class DuplicateIngredientError(Exception):
     pass
 
 
-# TODO rename to "add(...)"
-def insert(name: str, aisle: str, stocked: bool) -> UUID:
+def add(name: str, aisle: str, stocked: bool) -> UUID:
     try:
         with engine.connect() as conn:
             inserted = conn.execute(

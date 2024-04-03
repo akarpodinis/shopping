@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.infra.ingredients import names_and_ids
-from app.infra.recipes import DuplicateRecipeError, RecipeDoesNotExistError, all, insert, one
+from app.infra.recipes import DuplicateRecipeError, RecipeDoesNotExistError, add, all, one
 from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/recipes')
@@ -92,7 +92,7 @@ async def new_recipe(request: Request) -> Response:
             except ValueError as e:
                 return Response(content=f'Amount {e} should be an integer', status_code=422)
 
-        inserted = insert(name, amounts)
+        inserted = add(name, amounts)
     except DuplicateRecipeError:
         return Response(content=f'Duplicate recipe with name {name}', status_code=409)
 
