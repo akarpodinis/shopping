@@ -33,6 +33,19 @@ def new_form(request: Request):
     )
 
 
+@router.get('/list')
+def list_page(request: Request) -> Response:
+    recipes = all()
+
+    return templates.TemplateResponse(
+        request=request,
+        name='list.html',
+        context={
+            'recipes': [recipe['name'] for recipe in recipes]
+        }
+    )
+
+
 @router.get('/{id}')
 def get_one(id: str) -> Response:
     try:
