@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Make a shopping list</title>
+</head>
+<body>
+	<h1>Shopping list for {{date}}</h1>
+    {% for aisle in aisles %}
+        <h2>{{aisle.name}}</h1>
+            <ul>
+                {% for item in aisle.items %}
+                <li><input type="checkbox" />{{item.amount}} {{item.name}}</li>
+                {% endfor %}
+            </ul>
+        </ul>
+    {% endfor %}
+</body>
+</html>

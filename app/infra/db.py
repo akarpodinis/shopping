@@ -2,7 +2,7 @@ import os
 import re
 
 import sqlalchemy as sa
-from sqlalchemy import Boolean, Column, Float, String, Table, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, Float, String, Table, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
 database_url = re.sub('postgres(?:ql)?:', 'postgresql+psycopg:', os.environ['DATABASE_URL'])
@@ -40,4 +40,28 @@ ingredients_recipes = Table(
     Column('ingredient', UUID(as_uuid=True), nullable=False),
     Column('amount', Float, default=0),
     UniqueConstraint('recipe', 'ingredient', name='recipe_ingredient_key')
+)
+
+lists = Table(
+    'lists',
+    metadata,
+    Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
+    Column('date', DateTime, nullable=True)
+)
+
+list_recipes = Table(
+    'lists_recipes',
+    metadata,
+    Column('list', UUID(as_uuid=True), nullable=False),
+    Column('name', String, nullable=False),
+    Column('scale', Float, nullable=False, default=1.0)
+)
+
+list_items = Table(
+    'list_items',
+    metadata,
+    Column('list', UUID(as_uuid=True), nullable=False),
+    Column('name', String, nullable=False),
+    Column('aisle', String, nullable=False),
+    Column('amount', Float, nullable=False, default=0)
 )

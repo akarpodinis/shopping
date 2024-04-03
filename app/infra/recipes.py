@@ -44,6 +44,7 @@ class DuplicateRecipeError(Exception):
     pass
 
 
+# TODO rename to "add(...)"
 def insert(name: str, ingredients: list[tuple[UUID, int]]) -> UUID:
     try:
         with engine.connect() as conn:
@@ -73,3 +74,15 @@ def insert(name: str, ingredients: list[tuple[UUID, int]]) -> UUID:
             raise
 
     return inserted.id
+
+
+def stocked(ids: list[UUID]) -> list[tuple[UUID, str]]:
+    with engine.connect() as conn:
+        stocked = conn.execute(
+            select(ingredients.c.id, ingredients.c.name).distinct()
+            .join(ingredients_recipes, ingredients_recipes.c.ingredient == ingredients.c.id)
+            .join(recipes, recipes.c.id == ingredients_recipes.c.recipe)
+            .where(ingredients.c.stocked)
+            .where(recipes.c.id.in_(ids))
+        ).mappings().all()
+    return [(stock.id, stock.name) for stock in stocked]
