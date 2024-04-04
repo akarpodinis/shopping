@@ -38,16 +38,19 @@ def one(id: UUID) -> dict[str, Any]:
         return {
             'id': recipe.id,
             'name': recipe.name,
+            'servings': recipe.servings,
             'ingredients': [dict(row) for row in rows]
         }
 
 
-def update(id: UUID, name: str, ingredients: list[tuple[UUID, int]], notes: str) -> None:
+def update(id: UUID, name: str, servings: int, ingredients: list[tuple[UUID, int]],
+           notes: str) -> None:
     with engine.connect() as conn:
         # Update the base record
         conn.execute(
             recipes.update().values(
-                name=name
+                name=name,
+                servings=servings,
             ).where(recipes.c.id == id)
         )
 
@@ -85,16 +88,17 @@ class EditableIngredient:
 @dataclass
 class EditableRecipe:
     name: str
+    servings: int
     ingredients: list[EditableIngredient]
     notes: str
 
 
 def editable(id: UUID) -> EditableRecipe:
     with engine.connect() as conn:
-        name = conn.execute(
-            select(recipes.c.name)
+        recipe = conn.execute(
+            recipes.select()
             .where(recipes.c.id == id)
-        ).scalar()
+        ).mappings().first()
 
         notes = conn.execute(
             select(recipe_notes.c.notes)
@@ -119,7 +123,8 @@ def editable(id: UUID) -> EditableRecipe:
         ).mappings().all()
 
     return EditableRecipe(
-        name,
+        recipe.name,
+        recipe.servings,
         [EditableIngredient(ingredient.id, ingredient.name, ingredient.amount)
          for ingredient in recipe_ingredients],
         notes)
@@ -129,13 +134,14 @@ class DuplicateRecipeError(Exception):
     pass
 
 
-def add(name: str, ingredients: list[tuple[UUID, int]]) -> UUID:
+def add(name: str, servings: int, ingredients: list[tuple[UUID, int]]) -> UUID:
     try:
         with engine.connect() as conn:
             # Insert the base recipe record, raising if there's a duplicate name
             inserted = conn.execute(
                 recipes.insert().values(
-                    name=name
+                    name=name,
+                    servings=servings
                 ).returning(
                     recipes.c.id
                 )

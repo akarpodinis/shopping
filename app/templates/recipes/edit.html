@@ -8,6 +8,7 @@
       <h1>Ingredients</h1>
         <input type="hidden" name="ingredient_order" value="{{ingredient_order}}" />
         <div> Name <input type="text" name="name" value="{{name}}"/>
+        <div> Servings <input type="number" min="1" name="servings" value="{{servings}}" required /></div>
         <ul>
             {% for ingredient in ingredients %}
             <li>{{ingredient.name}}<input type="text" name="amounts" value="{{ingredient.amount}}"/>Amount</li>

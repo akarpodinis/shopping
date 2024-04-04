@@ -21,7 +21,7 @@ def list_ingredients() -> Response:
     return UUIDJSONResponse(content=all())
 
 
-# Ordering matters here.  I want the router to check /ingredients/new on GET before trying to
+# Ordering matters here.  I want the router to check /recipes/new on GET before trying to
 # figure out if the parameter is a UUID
 @router.get('/new')
 def new_form(request: Request):
@@ -95,6 +95,7 @@ def edit(id: str, request: Request) -> Response:
             context={
                 'id': id,
                 'name': recipe.name,
+                'servings': recipe.servings,
                 'ingredients': recipe.ingredients,
                 'ingredient_order': ingredient_order,
                 'notes': recipe.notes
@@ -105,6 +106,7 @@ def edit(id: str, request: Request) -> Response:
 @router.post('/{id}/update')
 def update_recipe(id: str,
                   name: Annotated[str, Form()],
+                  servings: Annotated[int, Form()],
                   ingredient_order: Annotated[str, Form()],
                   notes: Annotated[str, Form()] = None,
                   amounts: Annotated[list[float], Form()] = None) -> Response:
@@ -112,23 +114,15 @@ def update_recipe(id: str,
     for index, ingredient in enumerate(ingredient_order.split(',')):
         ingredient_amounts += [(UUID(ingredient), amounts[index])]
 
-    update(id, name, ingredient_amounts, notes)
+    update(id, name, servings, ingredient_amounts, notes)
 
     return RedirectResponse('/recipes/list?update_success=yes', status_code=303)
 
 
 @router.post('')
-async def new_recipe(request: Request) -> Response:
+async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form()],
+                     request: Request) -> Response:
     form_dict = await request.form()
-
-    # Find and validate the recipe name
-    try:
-        name = form_dict['name']
-        name = name.strip()
-        if not name:
-            return Response(content='Name is required', status_code=422)
-    except KeyError:
-        return Response(content='Name is required', status_code=422)
 
     # Find and validate the amounts for checked checkboxes
     # Magic '||' to get IDs.  The template has IDs set in the name with the form
@@ -146,7 +140,7 @@ async def new_recipe(request: Request) -> Response:
             except ValueError as e:
                 return Response(content=f'Amount {e} should be an integer', status_code=422)
 
-        inserted = add(name, amounts)
+        inserted = add(name, servings, amounts)
     except DuplicateRecipeError:
         return Response(content=f'Duplicate recipe with name {name}', status_code=409)
 

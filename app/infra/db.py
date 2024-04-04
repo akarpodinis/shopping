@@ -2,7 +2,9 @@ import os
 import re
 
 import sqlalchemy as sa
-from sqlalchemy import Boolean, Column, DateTime, Float, String, Table, Text, UniqueConstraint
+from sqlalchemy import (
+    Boolean, Column, DateTime, Float, Integer, String, Table, Text, UniqueConstraint
+)
 from sqlalchemy.dialects.postgresql import CITEXT, UUID
 
 database_url = re.sub('postgres(?:ql)?:', 'postgresql+psycopg:', os.environ['DATABASE_URL'])
@@ -30,6 +32,7 @@ recipes = Table(
     metadata,
     Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
     Column('name', CITEXT, unique=True, nullable=False),
+    Column('servings', Integer, nullable=False),
     UniqueConstraint('name')
 )
 
