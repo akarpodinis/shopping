@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Recipe</title>
+    <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+</head>
+<body>
+    <form action="/recipes/{{id}}/update", method="POST">
+        <h1>Ingredients</h1>
+        <input type="hidden" name="ingredient_order" value="{{ingredient_order}}" />
+        <div> Name <input type="text" name="name" value="{{name}}"/>
+            <div> Servings <input type="number" min="1" name="servings" value="{{servings}}" required /></div>
+            <ul>
+                {% for ingredient in ingredients %}
+                <li>{{ingredient.name}}<input type="text" name="amounts" value="{{ingredient.amount}}"/>Amount</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <h1>Notes</h1>
+        <div><textarea name="notes">{{notes}}</textarea></div>
+        <div><input type="submit" value="Update"></div>
+    </form>
+</body>
+</html>

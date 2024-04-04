@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Inspiration</title>
+        <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+    </head>
+    <body>
+        <ol>
+            {% for name in recipe_names %}
+            <li>{{name}}</li>
+            {% endfor %}
+        </ol>
+    </body>
+</html>

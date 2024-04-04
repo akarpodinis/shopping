@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Ingredient</title>
+    <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+</head>    
+<body>
+    <form action="/ingredients" method="POST">
+        {% for field in fields %}
+        <p>{{field}}: <input type = "{{types[loop.index0]}}" name = "{{field}}" {{required[loop.index0]}}/></p>
+        {% endfor %}
+        <input type="submit" value="Add" />
+    </form>
+</body>
+</html>
