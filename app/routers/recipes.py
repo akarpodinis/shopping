@@ -96,7 +96,8 @@ def edit(id: str, request: Request) -> Response:
                 'id': id,
                 'name': recipe.name,
                 'ingredients': recipe.ingredients,
-                'ingredient_order': ingredient_order
+                'ingredient_order': ingredient_order,
+                'notes': recipe.notes
             }
         )
 
@@ -105,12 +106,13 @@ def edit(id: str, request: Request) -> Response:
 def update_recipe(id: str,
                   name: Annotated[str, Form()],
                   ingredient_order: Annotated[str, Form()],
+                  notes: Annotated[str, Form()] = None,
                   amounts: Annotated[list[float], Form()] = None) -> Response:
     ingredient_amounts = []
     for index, ingredient in enumerate(ingredient_order.split(',')):
         ingredient_amounts += [(UUID(ingredient), amounts[index])]
 
-    update(id, name, ingredient_amounts)
+    update(id, name, ingredient_amounts, notes)
 
     return RedirectResponse('/recipes/list?update_success=yes', status_code=303)
 

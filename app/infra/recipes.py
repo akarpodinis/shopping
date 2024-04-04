@@ -4,9 +4,10 @@ from uuid import UUID
 
 from psycopg.errors import UniqueViolation
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 
-from app.infra.db import engine, ingredients, ingredients_recipes, recipes
+from app.infra.db import engine, ingredients, ingredients_recipes, recipe_notes, recipes
 
 
 def all() -> list[dict[str, Any]]:
@@ -41,13 +42,26 @@ def one(id: UUID) -> dict[str, Any]:
         }
 
 
-def update(id: UUID, name: str, ingredients: list[tuple[UUID, int]]) -> None:
+def update(id: UUID, name: str, ingredients: list[tuple[UUID, int]], notes: str) -> None:
     with engine.connect() as conn:
         # Update the base record
         conn.execute(
             recipes.update().values(
                 name=name
             ).where(recipes.c.id == id)
+        )
+
+        # Update notes with ON CONFLICT ... DO UPDATE
+        conn.execute(
+            insert(recipe_notes).values(
+                recipe=id,
+                notes=notes
+            ).on_conflict_do_update(
+                index_elements=[recipe_notes.c.recipe],
+                set_={
+                    recipe_notes.c.notes: notes
+                }
+            )
         )
 
         # Update the linked ingredients
@@ -57,6 +71,7 @@ def update(id: UUID, name: str, ingredients: list[tuple[UUID, int]]) -> None:
                     amount=ingredient[1]
                 ).where(ingredients_recipes.c.ingredient == ingredient[0])
             )
+
         conn.commit()
 
 
@@ -71,6 +86,7 @@ class EditableIngredient:
 class EditableRecipe:
     name: str
     ingredients: list[EditableIngredient]
+    notes: str
 
 
 def editable(id: UUID) -> EditableRecipe:
@@ -78,6 +94,11 @@ def editable(id: UUID) -> EditableRecipe:
         name = conn.execute(
             select(recipes.c.name)
             .where(recipes.c.id == id)
+        ).scalar()
+
+        notes = conn.execute(
+            select(recipe_notes.c.notes)
+            .where(recipe_notes.c.recipe == id)
         ).scalar()
 
         """
@@ -100,7 +121,8 @@ def editable(id: UUID) -> EditableRecipe:
     return EditableRecipe(
         name,
         [EditableIngredient(ingredient.id, ingredient.name, ingredient.amount)
-         for ingredient in recipe_ingredients])
+         for ingredient in recipe_ingredients],
+        notes)
 
 
 class DuplicateRecipeError(Exception):
