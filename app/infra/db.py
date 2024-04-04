@@ -2,7 +2,7 @@ import os
 import re
 
 import sqlalchemy as sa
-from sqlalchemy import Boolean, Column, DateTime, Float, String, Table, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, Float, String, Table, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
 database_url = re.sub('postgres(?:ql)?:', 'postgresql+psycopg:', os.environ['DATABASE_URL'])
@@ -31,6 +31,14 @@ recipes = Table(
     Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
     Column('name', String, unique=True, nullable=False),
     UniqueConstraint('name')
+)
+
+recipe_notes = Table(
+    'recipe_notes',
+    metadata,
+    Column('recipe', UUID(as_uuid=True), nullable=False),
+    Column('notes', Text),
+    UniqueConstraint('recipe', name='recipe_notes_recipe_key')
 )
 
 ingredients_recipes = Table(
