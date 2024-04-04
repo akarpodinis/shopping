@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a shopping list</title>
+    <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+</head>
+<body>
+    
+    <form action="/lists/confirm_stocked_and_arbitrary", method="POST">
+        <div>
+            Shopping list for the week of <input type="date" name="date" required />
+        </div>
+        <br />
+        <div>Available Recipes:</div>
+        <br />
+        {% for name in recipe_names %}
+        <div><input type="checkbox" name="included" value="{{recipe_ids[loop.index0]}}" />{{name}}: Scale <input type="text" name="scales" value="1.0" /></div>
+        {% endfor %}
+        <br />
+        <div><input type="submit" value="Create"></div>
+    </form>
+</body>
+</html>

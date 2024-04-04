@@ -13,7 +13,7 @@ from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/recipes')
 
-templates = Jinja2Templates(directory='app/templates/recipes')
+templates = Jinja2Templates(directory='app/resources/templates/recipes')
 
 
 @router.get('')

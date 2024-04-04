@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Chocolates';
+    src: url('/fonts/Chocolates/TT\ Chocolates\ Trial\ Regular.otf');
+}
+
+html *
+{
+    font-family: 'Chocolates'
+}

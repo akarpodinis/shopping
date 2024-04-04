@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>List Lists</title>
+        <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+    </head>
+    <body>
+        <ol>
+            {% for list in all_lists %}
+            <li> <a href="/lists/{{list.id}}/shopping">Shopping</a> {{list.date}} </li>
+            {% endfor %}
+        </ol>
+    </body>
+</html>

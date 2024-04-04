@@ -10,7 +10,7 @@ from app.infra import lists, recipes
 
 router = APIRouter(prefix='/lists')
 
-templates = Jinja2Templates(directory='app/templates/lists')
+templates = Jinja2Templates(directory='app/resources/templates/lists')
 
 
 @router.get('/list')

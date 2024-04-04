@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+    <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+</head>
+<body>
+    <h1>Manage lists</h1>
+    <a href="/lists/new">Make a new shopping list</a>
+    <br />
+    <a href="/lists/list">See all past lists</a>
+    <br />
+    <a href="/lists/recent">See recent recipes for inspiration</a>
+    
+    <h1>Manage ingredients</h1>
+    <a href="ingredients/list">See and edit ingredients</a>
+    <br />
+    <a href="/ingredients/new">Add an ingredient</a>
+    
+    <h1>Manage recipes</h1>
+    <a href="/recipes/list">See all recipes</a>
+    <br />
+    <a href="/recipes/new">Add a recipe</a>
+    
+</body>
+</html>

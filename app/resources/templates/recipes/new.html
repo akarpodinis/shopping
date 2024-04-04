@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Recipe</title>
+    <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+</head>
+<body>
+    <form action="/recipes", method="POST">
+        <div> Name <input type="text" name="name" pattern="^[^ ].+[^ ]$" required />
+            <div> Servings <input type="number" min="1" name="servings" value="1" required /></div>
+            <ul>
+                {% for name in names %}
+                <li><input type="checkbox" name="{{ids[loop.index0]}}||selected"/>{{name}}<input type="text" name="{{ids[loop.index0]}}||amount" />Amount</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div><input type="submit" value="Make"></div>
+    </form>
+</body>
+</html>
