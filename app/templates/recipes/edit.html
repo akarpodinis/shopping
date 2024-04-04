@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <form action="/recipes/{{id}}/update", method="POST">
+        <input type="hidden" name="ingredient_order" value="{{ingredient_order}}" />
+        <div> Name <input type="text" name="name" value="{{name}}"/>
+        <ul>
+            {% for ingredient in ingredients %}
+            <li>{{ingredient.name}}<input type="text" name="amounts" value="{{ingredient.amount}}"/>Amount</li>
+            {% endfor %}
+        </ul>
+      </div>
+      <div><input type="submit" value="Update"></div>
+    </form>
+  </body>
+</html>

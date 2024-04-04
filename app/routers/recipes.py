@@ -1,11 +1,14 @@
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.infra.ingredients import names_and_ids
-from app.infra.recipes import DuplicateRecipeError, RecipeDoesNotExistError, add, all, one
+from app.infra.recipes import (
+    DuplicateRecipeError, RecipeDoesNotExistError, add, all, editable, one, update
+)
 from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/recipes')
@@ -34,14 +37,21 @@ def new_form(request: Request):
 
 
 @router.get('/list')
-def list_page(request: Request) -> Response:
+def list_page(request: Request, update_success: str = 'no change') -> Response:
+    """
+    update_success needs to be ternary.
+    1. An update to a recipe was successful
+    2. An update to a recipe was unsuccessful
+    3. An update didn't happen at all
+    """
     recipes = all()
 
     return templates.TemplateResponse(
         request=request,
         name='list.html',
         context={
-            'recipes': [recipe['name'] for recipe in recipes]
+            'recipes': recipes,
+            'update_success': update_success
         }
     )
 
@@ -61,6 +71,48 @@ def get_one(id: str) -> Response:
         return Response(status_code=404)
     else:
         return UUIDJSONResponse(content=recipe, status_code=200)
+
+
+@router.get('/{id}/edit')
+def edit(id: str, request: Request) -> Response:
+    try:
+        converted_id = UUID(id)
+        if not converted_id.version or not converted_id.version == 4:
+            raise ValueError
+    except ValueError:
+        return Response(content='id in path should be a UUID', status_code=422)
+
+    try:
+        recipe = editable(id)
+    except RecipeDoesNotExistError:
+        return Response(status_code=404)
+    else:
+        ingredient_order = ','.join([str(ingredient.id) for ingredient in recipe.ingredients])
+
+        return templates.TemplateResponse(
+            request=request,
+            name='edit.html',
+            context={
+                'id': id,
+                'name': recipe.name,
+                'ingredients': recipe.ingredients,
+                'ingredient_order': ingredient_order
+            }
+        )
+
+
+@router.post('/{id}/update')
+def update_recipe(id: str,
+                  name: Annotated[str, Form()],
+                  ingredient_order: Annotated[str, Form()],
+                  amounts: Annotated[list[float], Form()] = None) -> Response:
+    ingredient_amounts = []
+    for index, ingredient in enumerate(ingredient_order.split(',')):
+        ingredient_amounts += [(UUID(ingredient), amounts[index])]
+
+    update(id, name, ingredient_amounts)
+
+    return RedirectResponse('/recipes/list?update_success=yes', status_code=303)
 
 
 @router.post('')
