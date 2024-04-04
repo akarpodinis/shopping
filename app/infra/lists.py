@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, label, or_, select
+from sqlalchemy import func, distinct, label, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.infra.db import (
@@ -16,6 +16,25 @@ def all() -> list[dict[str, Any]]:
         all_lists = conn.execute(lists.select().order_by(lists.c.date.desc())).mappings().all()
 
     return [dict(one_list) for one_list in all_lists]
+
+
+def past_recipes(count: int) -> list[dict[str, Any]]:
+    with engine.connect() as conn:
+        """select distinct on (lr.name) l.date, lr.name from lists_recipes lr
+            join lists as l on l.id = lr.list
+            order by lr.name, l.date desc;
+        """
+        query = select(list_recipes.c.name, lists.c.date).distinct(list_recipes.c.name) \
+            .join(lists, lists.c.id == list_recipes.c.list) \
+            .order_by(list_recipes.c.name) \
+            .order_by(lists.c.date.desc())
+
+        if count > 0:
+            query = query.limit(count)
+
+        past_recipes = conn.execute(query).mappings().all()
+
+    return [dict(recipe) for recipe in past_recipes]
 
 
 def add(date: datetime, recipe_scales: dict[UUID, float], included_ingredients: list[UUID],
