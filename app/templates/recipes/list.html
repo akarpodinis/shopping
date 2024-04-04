@@ -4,9 +4,18 @@
 <title>Edit ingredients</title>
 </head>
 <body>
+  <div>
+  {% if update_success == "yes" %}
+    Update successful!
+  {% elif update_success == "no" %}
+    Update failed!  Call that stupid admin.
+  {% else %}
+    <!-- No update detected -->
+  {% endif %}
+  </div>
   <ol>
     {% for recipe in recipes %}
-    <li> {{recipe}} </li>
+    <li> <a href="/recipes/{{recipe.id}}/edit">Edit</a> {{recipe.name}} </li>
     {% endfor %}
   </ol>
 </body>
