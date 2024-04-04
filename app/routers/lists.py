@@ -103,7 +103,7 @@ def shopping(id: str, request: Request) -> Response:
         request=request,
         name='shopping.html',
         context={
-            'date': shopping_list.date,
+            'date': datetime.strftime(shopping_list.date, '%A, %B %-m, %Y'),
             'aisles': shopping_list.aisles
         }
     )
