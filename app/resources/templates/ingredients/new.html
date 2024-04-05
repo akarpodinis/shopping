@@ -6,9 +6,16 @@
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
 </head>    
 <body>
+    <h1>New Ingredient</h1>
     <form action="/ingredients" method="POST">
         {% for field in fields %}
-        <p>{{field}}: <input type = "{{types[loop.index0]}}" name = "{{field}}" {{required[loop.index0]}}/></p>
+            {% if types[loop.index0] == "checkbox" %}
+            <input id="{{loop.index0}}" class="check" type="{{types[loop.index0]}}" name="{{field}}" {{required[loop.index0]}}/>
+            <label class="proper-word" for="{{loop.index0}}">{{field}}</label>
+            {% else %}
+            <div><label class="proper-word">{{field}}</label><input type="{{types[loop.index0]}}" name="{{field}}" {{required[loop.index0]}}/></div>
+            {% endif %}
+            <br />
         {% endfor %}
         <input type="submit" value="Add" />
     </form>

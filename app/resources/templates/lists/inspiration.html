@@ -6,6 +6,7 @@
         <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
     </head>
     <body>
+        <h1>Recently shopped-for recipes</h1>
         <ol>
             {% for name in recipe_names %}
             <li>{{name}}</li>

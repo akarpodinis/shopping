@@ -6,18 +6,20 @@
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
 </head>
 <body>
-    
+    <h1>New Shopping List</h1>
     <form action="/lists/confirm_stocked_and_arbitrary", method="POST">
         <div>
             Shopping list for the week of <input type="date" name="date" required />
         </div>
         <br />
         <div>Available Recipes:</div>
-        <br />
         {% for name in recipe_names %}
-        <div><input type="checkbox" name="included" value="{{recipe_ids[loop.index0]}}" />{{name}}: Scale <input type="text" name="scales" value="1.0" /></div>
-        {% endfor %}
+        <div class="new-recipe-ingredient-line">
+            <input class="check" id="{{loop.index0}}" type="checkbox" name="included" value="{{recipe_ids[loop.index0]}}" />
+            <label class="recipe-name-label" for="{{loop.index0}}">{{name}}</label> <div class="check-and-scale-scale"> <label class="recipe-name-label">Scale</label> <input class="check-and-scale-scale-text" type="text" name="scales" value="1.0" /> </div>
+        </div>
         <br />
+        {% endfor %}
         <div><input type="submit" value="Create"></div>
     </form>
 </body>

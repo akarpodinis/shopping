@@ -1,3 +1,4 @@
+from html import escape
 from typing import Annotated
 from uuid import UUID
 
@@ -37,13 +38,7 @@ def new_form(request: Request):
 
 
 @router.get('/list')
-def list_page(request: Request, update_success: str = 'no change') -> Response:
-    """
-    update_success needs to be ternary.
-    1. An update to a recipe was successful
-    2. An update to a recipe was unsuccessful
-    3. An update didn't happen at all
-    """
+def list_page(request: Request, message: str = '') -> Response:
     recipes = all()
 
     return templates.TemplateResponse(
@@ -51,7 +46,7 @@ def list_page(request: Request, update_success: str = 'no change') -> Response:
         name='list.html',
         context={
             'recipes': recipes,
-            'update_success': update_success
+            'message': message
         }
     )
 
@@ -114,9 +109,13 @@ def update_recipe(id: str,
     for index, ingredient in enumerate(ingredient_order.split(',')):
         ingredient_amounts += [(UUID(ingredient), amounts[index])]
 
-    update(id, name, servings, ingredient_amounts, notes)
+    try:
+        update(id, name, servings, ingredient_amounts, notes)
+        message = f'Success, updated recipe {name}'
+    except DuplicateRecipeError:
+        message = f'Duplicate recipe called {name}'
 
-    return RedirectResponse('/recipes/list?update_success=yes', status_code=303)
+    return RedirectResponse(f'/recipes/list?message={escape(message)}', status_code=303)
 
 
 @router.post('')
@@ -130,7 +129,7 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
 
     try:
         selected_ids = [
-            UUID(key.split('||')[0]) for key in form_dict.keys() if 'on' in form_dict[key]
+            UUID(key.split('||')[0]) for key in form_dict.keys() if 'on' == form_dict[key]
         ]
         amounts = []
         for selected_id in selected_ids:
@@ -140,8 +139,9 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
             except ValueError as e:
                 return Response(content=f'Amount {e} should be an integer', status_code=422)
 
-        inserted = add(name, servings, amounts)
+        add(name, servings, amounts)
+        message = f'Success, added recipe {name}'
     except DuplicateRecipeError:
-        return Response(content=f'Duplicate recipe with name {name}', status_code=409)
+        message = f'Duplicate recipe called {name}'
 
-    return RedirectResponse(f'/recipes/{inserted}', status_code=303)
+    return RedirectResponse(f'/recipes/list?message={escape(message)}', status_code=303)

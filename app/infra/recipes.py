@@ -45,37 +45,43 @@ def one(id: UUID) -> dict[str, Any]:
 
 def update(id: UUID, name: str, servings: int, ingredients: list[tuple[UUID, int]],
            notes: str) -> None:
-    with engine.connect() as conn:
-        # Update the base record
-        conn.execute(
-            recipes.update().values(
-                name=name,
-                servings=servings,
-            ).where(recipes.c.id == id)
-        )
-
-        # Update notes with ON CONFLICT ... DO UPDATE
-        conn.execute(
-            insert(recipe_notes).values(
-                recipe=id,
-                notes=notes
-            ).on_conflict_do_update(
-                index_elements=[recipe_notes.c.recipe],
-                set_={
-                    recipe_notes.c.notes: notes
-                }
-            )
-        )
-
-        # Update the linked ingredients
-        for ingredient in ingredients:
+    try:
+        with engine.connect() as conn:
+            # Update the base record
             conn.execute(
-                ingredients_recipes.update().values(
-                    amount=ingredient[1]
-                ).where(ingredients_recipes.c.ingredient == ingredient[0])
+                recipes.update().values(
+                    name=name,
+                    servings=servings,
+                ).where(recipes.c.id == id)
             )
 
-        conn.commit()
+            # Update notes with ON CONFLICT ... DO UPDATE
+            conn.execute(
+                insert(recipe_notes).values(
+                    recipe=id,
+                    notes=notes
+                ).on_conflict_do_update(
+                    index_elements=[recipe_notes.c.recipe],
+                    set_={
+                        recipe_notes.c.notes: notes
+                    }
+                )
+            )
+
+            # Update the linked ingredients
+            for ingredient in ingredients:
+                conn.execute(
+                    ingredients_recipes.update().values(
+                        amount=ingredient[1]
+                    ).where(ingredients_recipes.c.ingredient == ingredient[0])
+                )
+
+            conn.commit()
+    except IntegrityError as e:
+        if isinstance(e.orig, UniqueViolation):
+            raise DuplicateRecipeError
+        else:
+            raise
 
 
 @dataclass

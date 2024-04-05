@@ -6,9 +6,10 @@
         <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
     </head>
     <body>
+        <h1>All lists</h1>
         <ol>
             {% for list in all_lists %}
-            <li> <a href="/lists/{{list.id}}/shopping">Shopping</a> {{list.date}} </li>
+            <li> <a href="/lists/{{list.id}}/shopping">{{list.date}}</a> </li>
             {% endfor %}
         </ol>
     </body>

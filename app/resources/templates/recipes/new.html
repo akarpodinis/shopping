@@ -6,16 +6,20 @@
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
 </head>
 <body>
-    <form action="/recipes", method="POST">
-        <div> Name <input type="text" name="name" pattern="^[^ ].+[^ ]$" required />
-            <div> Servings <input type="number" min="1" name="servings" value="1" required /></div>
-            <ul>
-                {% for name in names %}
-                <li><input type="checkbox" name="{{ids[loop.index0]}}||selected"/>{{name}}<input type="text" name="{{ids[loop.index0]}}||amount" />Amount</li>
-                {% endfor %}
-            </ul>
+    <h1>New Recipe</h1>
+    <form action="/recipes" method="POST">
+        <p>Name <input type="text" name="name" pattern="^[^ ].+[^ ]$" required /></p>
+        <p>Servings <input type="number" min="1" name="servings" value="1" required /></p>
+        <h2>Ingredients</h2>
+        {% for name in names %}
+        <div class="new-recipe-ingredient-line">
+            <input id="{{loop.index0}}" class="check" type="checkbox" name="{{ids[loop.index0]}}||selected" />
+            <label class="recipe-name-label" for="{{loop.index0}}">{{name}}</label>
+            <input class="check-and-scale-scale-text" type="text" name="{{ids[loop.index0]}}||amount" /><label class="recipe-name-label">Amount</label>
         </div>
-        <div><input type="submit" value="Make"></div>
+        <br />
+        {% endfor %}
+        <input type="submit" value="Make">
     </form>
 </body>
 </html>

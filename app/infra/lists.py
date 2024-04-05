@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, distinct, label, or_, select
+from sqlalchemy import func, label, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.infra.db import (
@@ -95,11 +95,12 @@ def add(date: datetime, recipe_scales: dict[UUID, float], included_ingredients: 
             ).mappings().all()
 
         # Combine the ingredient amounts by ID
-        for ingredient in resolved_ingredients:
-            if ingredient.id in desired_ingredients:
-                desired_ingredients[ingredient.id]['amount'] += ingredient.amount
+        for resolved_ingredient in resolved_ingredients:
+            ingredient = dict(resolved_ingredient)
+            if ingredient['id'] in desired_ingredients:
+                desired_ingredients[ingredient['id']]['amount'] += ingredient['amount']
             else:
-                desired_ingredients[ingredient.id] = ingredient
+                desired_ingredients[ingredient['id']] = ingredient
 
         # Create the historical list ingredient item information
         conn.execute(
