@@ -17,6 +17,9 @@ templates = Jinja2Templates(directory='app/resources/templates/lists')
 def list_lists(request: Request) -> Response:
     all_lists = lists.all()
 
+    for list in all_lists:
+        list['date'] = datetime.strftime(list['date'], r'%A, %B %-m, %Y')
+
     return templates.TemplateResponse(
         request=request,
         name='list.html',

@@ -2,13 +2,15 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Ingredient</title>
+    <title>Listing ingredients</title>
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
 </head>
 <body>
+    <h1>Ingredients</h1>
+    <div class="quick-status">{{message}}</div>
     <ol>
         {% for ingredient in ingredients %}
-        <li> <a href="/ingredients/{{ingredient.0}}/edit">Edit</a> Ingredient {{ingredient.1}} found in aisle {{ingredient.2}} {{ingredient.3}}</li>
+        <li> <a href="/ingredients/{{ingredient.0}}/edit">Edit</a> {{ingredient.1}} found in aisle {{ingredient.2}} {{ingredient.3}}</li>
         {% endfor %}
     </ol>
 </body>

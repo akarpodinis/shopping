@@ -1,3 +1,4 @@
+from html import escape
 from typing import Annotated
 from uuid import UUID
 
@@ -33,13 +34,14 @@ def new_form(request: Request):
 
 
 @router.get('/list')
-def list_page(request: Request) -> Response:
+def list_page(request: Request, message: str = '') -> Response:
     ingredients = all()
 
     return templates.TemplateResponse(
         request=request,
         name='list.html',
         context={
+            'message': message,
             'ingredients': [(str(ingredient['id']),
                              ingredient['name'],
                              ingredient['aisle'],
@@ -68,11 +70,12 @@ def new_ingredient(name: Annotated[str, Form()],
                    aisle: Annotated[str, Form()],
                    stocked: Annotated[bool, Form()] = False) -> Response:
     try:
-        inserted = add(name, aisle, stocked)
+        add(name, aisle, stocked)
+        message = f'Success, added ingredient {name}'
     except DuplicateIngredientError:
-        return Response(content=f'Duplicate ingredient with name {name}', status_code=409)
+        message = f'Duplicate ingredient called {name}'
 
-    return RedirectResponse(f'/ingredients/{inserted}', status_code=303)
+    return RedirectResponse(f'/ingredients/list?message={escape(message)}', status_code=303)
 
 
 # This should be a PATCH but HTML forms don't support that method.
@@ -84,10 +87,11 @@ def edit(id: str,
          stocked: Annotated[bool, Form()] = False) -> Response:
     try:
         update(UUID(id), stocked, name, aisle)
+        message = f'Success, updated ingredient {name}'
     except DuplicateIngredientError:
-        return Response(content=f'Duplicate ingredient with name {name}', status_code=409)
+        message = f'Duplicate ingredient called {name}'
 
-    return RedirectResponse(f'/ingredients/{id}', status_code=303)
+    return RedirectResponse(f'/ingredients/list?message={escape(message)}', status_code=303)
 
 
 @router.delete('/{id}')

@@ -6,7 +6,14 @@
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
 </head>
 <body>
+    <h1>Check Stock</h1>
+    {% if recipes|length == 0 %}
+    <h2>Check your stock of these ingredients.  Include them on your list?</h2>
+    {% else %}
+    <h2>No stocked items need checking</h2>
+    {% endif %}
     <form action="/lists" method="POST">
+        <!-- Hidden input to pass transient data onto the list resource creation -->
         <input type="hidden" name="date" value="{{date}}" />
         {% for recipe in recipes %}
         <input type="hidden" name="recipes" value="{{recipe}}" />
@@ -14,20 +21,18 @@
         {% for scale in scales %}
         <input type="hidden" name="scales" value="{{scale}}" />
         {% endfor %}
-        <div>
-            Check your stock of these ingredients.  Include them on your list?
-        </div>
-        <br />
+
         {% for name in names %}
-        <div><input type="checkbox" name="include_ingredients" value="{{ids[loop.index0]}}" /> {{name}} </div>
+        <input id="{{loop.index0}}" class="check" type="checkbox" name="include_ingredients" value="{{ids[loop.index0]}}" />
+        <label for="{{loop.index0}}">{{name}}</label>
         {% endfor %}
         <br />
-        <div>Need other things that aren't in a recipe?  Add them here.</div>
+        <h2>Need other things that aren't in a recipe?  Add them here.</h2>
         <br />
-        {% for i in range(1, 11) %}
+        {% for i in range(1, 8) %}
         <div>Name:<input type="text" name="arbitrary_names" />Aisle:<input type="text" name="arbitrary_aisles" />Amount:<input type="text" name="arbitrary_amounts"></div>
-        {% endfor %}
         <br />
+        {% endfor %}
         <div><input type="submit" value="Include"></div>
     </form>
 </body>

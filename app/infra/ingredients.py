@@ -86,6 +86,7 @@ def edit_template_configuration(id: UUID) -> dict[str, Any]:
 
     return {
         'id': str(id),
+        'name': ingredient['name'],
         'fields': [
             ingredients.c.name.name,
             ingredients.c.aisle.name,
