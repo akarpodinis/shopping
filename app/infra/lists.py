@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -170,3 +170,16 @@ def for_shopping(id: UUID) -> ShoppingList:
                 aisles[item.aisle].items += [new_list_item]
 
     return ShoppingList(list_date, list(aisles.values()))
+
+
+def latest() -> list[dict[str, Any]]:
+    with engine.connect() as conn:
+        latest = conn.execute(
+            select(lists)
+            .where(
+                func.extract('day', lists.c.date) == func.extract('day', func.now())
+            )
+            .order_by(lists.c.date)
+        ).mappings().all()
+
+    return latest
