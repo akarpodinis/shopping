@@ -215,6 +215,13 @@ input[type=submit] {
     font-size: 10px;
 }
 
+.check:checked + label.proper-word {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    color: #abbab4;
+    text-decoration-color: #2a5948;
+}
+
 @media only screen and (min-width: 600px) {
     .check:checked + label::after {
         background-size: 12px 12px;
