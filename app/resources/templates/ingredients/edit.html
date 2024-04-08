@@ -12,7 +12,7 @@
         {% for field in fields %}
         {% if types[loop.index0] == "checkbox" %}
         <input id="{{loop.index0}}" class="check" type="{{types[loop.index0]}}" name="{{field}}" {{existing[loop.index0]}}/>
-        <label class="proper-word" for="{{loop.index0}}">{{field}}</label>
+        <label class="proper-word-for-status" for="{{loop.index0}}">{{field}}</label>
         {% else %}
         <div><label class="proper-word">{{field}}</label><input type="{{types[loop.index0]}}" name="{{field}}" value="{{existing[loop.index0]}}"/></div>
         {% endif %}
