@@ -6,7 +6,7 @@ from fastapi import APIRouter, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.infra import lists, recipes
+from app.infra import lists, quick, recipes
 
 router = APIRouter(prefix='/lists')
 
@@ -39,10 +39,13 @@ def new_form(request: Request) -> Response:
         names.append(recipe['name'])
         ids.append(recipe['id'])
 
+    current_summary = ', '.join(f'{item['amount']}x {item['name']}' for item in quick.current())
+
     return templates.TemplateResponse(
         request=request,
         name='new.html',
         context={
+            'quick_items': current_summary,
             'recipe_names': names,
             'recipe_ids': ids
         }
