@@ -112,6 +112,11 @@ input[type=number] {
     text-transform: capitalize;
 }
 
+.proper-word-for-status {
+    text-transform: capitalize;
+    /* text-decoration: none; */
+}
+
 input[type=submit] {
     background-color:#2a5948;
     border-radius:5px;
@@ -204,12 +209,6 @@ input[type=submit] {
     align-items: center;
     height: 35px;
     color: #2a5948;
-}
-
-@media only screen and (max-width: 601px) {
-    .check + label {
-        flex-grow: 2;
-    }
 }
 
 .check + label::before {
