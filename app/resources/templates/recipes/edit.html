@@ -13,7 +13,7 @@
         Servings <input type="number" min="1" name="servings" value="{{servings}}" required />
         <h2>Ingredients</h2>
         {% for ingredient in ingredients %}
-        <div class="new-recipe-ingredient-line">
+        <div class="input-line">
             <label class="recipe-name-label">{{ingredient.name}}</label><input class="check-and-scale-scale-text" type="text" name="amounts" value="{{ingredient.amount}}"/><label class="recipe-name-label">Amount</label></li>
             <br />
         </div>

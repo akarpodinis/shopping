@@ -11,10 +11,31 @@ html * {
 h1 {
     border-bottom: 4px dotted #f27457;
     width: 100%;
+    /* Margin, not padding, because I want the heading to be closer to the div */
+    /* margin-top: -10px; */
+}
+
+@media only screen and (max-width: 601px) {
+    h1 {
+        font-size: 25pt;
+    }
+    h2 {
+        font-size: 21pt;
+    }
 }
 
 body {
     background: #f2f2f2;
+}
+
+div.sticky-heading {
+    position: sticky;
+    top: 0;
+    background-color: #f2f2f2;
+    align-self: flex-start;
+    background: linear-gradient(180deg, rgba(242,242,242,1) 90%, rgba(242,242,242,0) 100%);
+    /* Padding, not margin, because I want more background visible below the div */
+    padding-bottom: 10px;
 }
 
 a:link, a:visited {
@@ -30,7 +51,26 @@ a:active, a:hover {
     color: #9d6556;
 }
 
-.new-recipe-ingredient-line {
+.quick-item-summary {
+    font-style: italic;
+    font-size: 17px;
+}
+
+@media only screen and (max-width: 601px) {
+
+    .shopping-date {
+        display: flex;
+        align-items: center;
+    }
+
+    .shopping-date label {
+        flex-grow: 2;
+        text-wrap: nowrap;
+        padding-right: 2px;
+    }
+}
+
+.input-line {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -38,7 +78,7 @@ a:active, a:hover {
 }
 
 @media only screen and (max-width: 601px) {
-    .new-recipe-ingredient-line label {
+    .input-line label {
         font-size: 15pt;
     }
 }
@@ -79,6 +119,8 @@ input[type=submit] {
     cursor:pointer;
     color:#f2f2f2;
     text-decoration:none;
+    position: sticky;
+    top: 0;
 }
 
 @media only screen and (min-width: 600px) {
