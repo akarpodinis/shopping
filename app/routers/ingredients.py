@@ -66,7 +66,7 @@ def get_one(id: str) -> Response:
 
 
 @router.post('')
-def new_ingredient(submit_button: str,
+def new_ingredient(submit_button: Annotated[str, Form()],
                    name: Annotated[str, Form()],
                    aisle: Annotated[str, Form()],
                    stocked: Annotated[bool, Form()] = False) -> Response:
