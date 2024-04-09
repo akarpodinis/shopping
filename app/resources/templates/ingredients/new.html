@@ -12,13 +12,13 @@
         {% for field in fields %}
             {% if types[loop.index0] == "checkbox" %}
             <input id="{{loop.index0}}" class="check" type="{{types[loop.index0]}}" name="{{field}}" {{required[loop.index0]}}/>
-            <label class="proper-word" for="{{loop.index0}}">{{field}}</label>
+            <label class="proper-word-for-status" for="{{loop.index0}}">{{field}}</label>
             {% else %}
             <div><label class="proper-word">{{field}}</label><input type="{{types[loop.index0]}}" name="{{field}}" {{required[loop.index0]}}/></div>
             {% endif %}
             <br />
-        {% endfor %}
-        <input type="submit" value="Add" />
+            {% endfor %}
+            <div class="multiple-submit-buttons"><input type="submit" name="submit_button" value="Add one and done" /><input type="submit" name="submit_button" value="Add one and add another"></div>
     </form>
 </body>
 </html>
