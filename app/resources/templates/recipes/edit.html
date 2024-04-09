@@ -14,7 +14,7 @@
         <h2>Ingredients</h2>
         {% for ingredient in ingredients %}
         <div class="input-line">
-            <label class="recipe-name-label">{{ingredient.name}}</label><input class="check-and-scale-scale-text" type="text" name="amounts" value="{{ingredient.amount}}"/><label class="recipe-name-label">Amount</label></li>
+            <label class="recipe-ingredient-label">{{ingredient.name}}</label><label class="recipe-name-label">Amount</label><input class="check-and-scale-scale-text" type="text" name="amounts" value="{{ingredient.amount}}"/></li>
             <br />
         </div>
         {% endfor %}

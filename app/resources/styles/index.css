@@ -54,6 +54,10 @@ a:active, a:hover {
     font-size: 17px;
 }
 
+.recipe-ingredient-label {
+    flex-grow: 2;
+}
+
 @media only screen and (max-width: 601px) {
 
     .shopping-date {
