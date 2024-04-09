@@ -11,8 +11,6 @@ html * {
 h1 {
     border-bottom: 4px dotted #f27457;
     width: 100%;
-    /* Margin, not padding, because I want the heading to be closer to the div */
-    /* margin-top: -10px; */
 }
 
 @media only screen and (max-width: 601px) {
@@ -114,7 +112,6 @@ input[type=number] {
 
 .proper-word-for-status {
     text-transform: capitalize;
-    /* text-decoration: none; */
 }
 
 input[type=submit] {
@@ -124,8 +121,12 @@ input[type=submit] {
     cursor:pointer;
     color:#f2f2f2;
     text-decoration:none;
-    position: sticky;
-    top: 0;
+}
+
+.multiple-submit-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1em;
 }
 
 @media only screen and (min-width: 600px) {
@@ -209,6 +210,16 @@ input[type=submit] {
     align-items: center;
     height: 35px;
     color: #2a5948;
+}
+
+.check:focus + label {
+    box-shadow: #2a5948;
+}
+
+@media only screen and (max-width: 601px) {
+    .check + label {
+        flex-grow: 2;
+    }
 }
 
 .check + label::before {

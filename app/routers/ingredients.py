@@ -66,7 +66,8 @@ def get_one(id: str) -> Response:
 
 
 @router.post('')
-def new_ingredient(name: Annotated[str, Form()],
+def new_ingredient(submit_button: str,
+                   name: Annotated[str, Form()],
                    aisle: Annotated[str, Form()],
                    stocked: Annotated[bool, Form()] = False) -> Response:
     try:
@@ -75,7 +76,10 @@ def new_ingredient(name: Annotated[str, Form()],
     except DuplicateIngredientError:
         message = f'Duplicate ingredient called {name}'
 
-    return RedirectResponse(f'/ingredients/list?message={escape(message)}', status_code=303)
+    destination = 'list' if 'done' in submit_button else 'new'
+
+    return RedirectResponse(f'/ingredients/{destination}?message={escape(message)}',
+                            status_code=303)
 
 
 # This should be a PATCH but HTML forms don't support that method.
