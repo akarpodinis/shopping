@@ -18,7 +18,10 @@
             {% endif %}
             <br />
             {% endfor %}
-            <div class="multiple-submit-buttons"><input type="submit" name="submit_button" value="Add one and done" /><input type="submit" name="submit_button" value="Add one and add another"></div>
+            <div class="multiple-submit-buttons">
+                <button type="submit" name="submit_button" value="done">Add one and done</button>
+                <button type="submit" name="submit_button" value="more">Add one and add another</button>
+            </div>
     </form>
 </body>
 </html>
