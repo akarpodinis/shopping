@@ -33,6 +33,7 @@ recipes = Table(
     Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
     Column('name', CITEXT, unique=True, nullable=False),
     Column('servings', Integer, nullable=False),
+    Column('routine', Boolean, nullable=False, default=False),
     UniqueConstraint('name')
 )
 

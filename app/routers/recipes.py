@@ -90,6 +90,7 @@ def edit(id: str, request: Request) -> Response:
             context={
                 'id': id,
                 'name': recipe.name,
+                'already_routine': 'checked' if recipe.routine else '',
                 'servings': recipe.servings,
                 'ingredients': recipe.ingredients,
                 'ingredient_order': ingredient_order,
@@ -103,6 +104,7 @@ def update_recipe(id: str,
                   name: Annotated[str, Form()],
                   servings: Annotated[int, Form()],
                   ingredient_order: Annotated[str, Form()],
+                  is_routine: Annotated[bool, Form()] = False,
                   notes: Annotated[str, Form()] = None,
                   amounts: Annotated[list[float], Form()] = None) -> Response:
     ingredient_amounts = []
@@ -110,7 +112,7 @@ def update_recipe(id: str,
         ingredient_amounts += [(UUID(ingredient), amounts[index])]
 
     try:
-        update(id, name, servings, ingredient_amounts, notes)
+        update(id, name, is_routine, servings, ingredient_amounts, notes)
         message = f'Success, updated recipe {name}'
     except DuplicateRecipeError:
         message = f'Duplicate recipe called {name}'
@@ -120,7 +122,7 @@ def update_recipe(id: str,
 
 @router.post('')
 async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form()],
-                     request: Request) -> Response:
+                     is_routine: Annotated[bool, Form()], request: Request) -> Response:
     form_dict = await request.form()
 
     # Find and validate the amounts for checked checkboxes
@@ -129,7 +131,7 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
 
     try:
         selected_ids = [
-            UUID(key.split('||')[0]) for key in form_dict.keys() if 'on' == form_dict[key]
+            UUID(key.split('||')[0]) for key in form_dict.keys() if 'selected' in key
         ]
         amounts = []
         for selected_id in selected_ids:
@@ -139,7 +141,7 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
             except ValueError as e:
                 return Response(content=f'Amount {e} should be an integer', status_code=422)
 
-        add(name, servings, amounts)
+        add(name, is_routine, servings, amounts)
         message = f'Success, added recipe {name}'
     except DuplicateRecipeError:
         message = f'Duplicate recipe called {name}'

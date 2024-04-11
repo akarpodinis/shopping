@@ -37,13 +37,14 @@ def one(id: UUID) -> dict[str, Any]:
 
         return {
             'id': recipe.id,
+            'routine': recipe.routine,
             'name': recipe.name,
             'servings': recipe.servings,
             'ingredients': [dict(row) for row in rows]
         }
 
 
-def update(id: UUID, name: str, servings: int, ingredients: list[tuple[UUID, int]],
+def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, int]],
            notes: str) -> None:
     try:
         with engine.connect() as conn:
@@ -52,6 +53,7 @@ def update(id: UUID, name: str, servings: int, ingredients: list[tuple[UUID, int
                 recipes.update().values(
                     name=name,
                     servings=servings,
+                    routine=routine
                 ).where(recipes.c.id == id)
             )
 
@@ -94,6 +96,7 @@ class EditableIngredient:
 @dataclass
 class EditableRecipe:
     name: str
+    routine: bool
     servings: int
     ingredients: list[EditableIngredient]
     notes: str
@@ -130,6 +133,7 @@ def editable(id: UUID) -> EditableRecipe:
 
     return EditableRecipe(
         recipe.name,
+        recipe.routine,
         recipe.servings,
         [EditableIngredient(ingredient.id, ingredient.name, ingredient.amount)
          for ingredient in recipe_ingredients],
@@ -140,13 +144,14 @@ class DuplicateRecipeError(Exception):
     pass
 
 
-def add(name: str, servings: int, ingredients: list[tuple[UUID, int]]) -> UUID:
+def add(name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, int]]) -> UUID:
     try:
         with engine.connect() as conn:
             # Insert the base recipe record, raising if there's a duplicate name
             inserted = conn.execute(
                 recipes.insert().values(
                     name=name,
+                    routine=routine,
                     servings=servings
                 ).returning(
                     recipes.c.id
@@ -172,7 +177,7 @@ def add(name: str, servings: int, ingredients: list[tuple[UUID, int]]) -> UUID:
     return inserted.id
 
 
-def stocked(ids: list[UUID]) -> list[tuple[UUID, str]]:
+def stocked(ids: list[UUID]) -> list[dict[str, Any]]:
     with engine.connect() as conn:
         stocked = conn.execute(
             select(ingredients.c.id, ingredients.c.name).distinct()
@@ -181,4 +186,4 @@ def stocked(ids: list[UUID]) -> list[tuple[UUID, str]]:
             .where(ingredients.c.stocked)
             .where(recipes.c.id.in_(ids))
         ).mappings().all()
-    return [(stock.id, stock.name) for stock in stocked]
+    return [dict(stock) for stock in stocked]
