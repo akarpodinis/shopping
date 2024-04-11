@@ -122,7 +122,7 @@ def update_recipe(id: str,
 
 @router.post('')
 async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form()],
-                     is_routine: Annotated[bool, Form()], request: Request) -> Response:
+                     request: Request, is_routine: Annotated[bool, Form()] = False) -> Response:
     form_dict = await request.form()
 
     # Find and validate the amounts for checked checkboxes
