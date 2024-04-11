@@ -17,8 +17,13 @@ h1 {
     h1 {
         font-size: 25pt;
     }
+
     h2 {
         font-size: 21pt;
+    }
+
+    h3 {
+        font-size: 17pt;
     }
 }
 
@@ -63,6 +68,7 @@ a:active, a:hover {
     .shopping-date {
         display: flex;
         align-items: center;
+        gap: 5px;
     }
 
     .shopping-date label {

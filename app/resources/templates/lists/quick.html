@@ -19,6 +19,8 @@
         </div>
         {% endfor %}
     </ul>
+    {% else %}
+    <div>You have no quick items</div>
     {% endif %}
     <h2>New quick items</h2>
     <form action="/quick/list" method="POST">

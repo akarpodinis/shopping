@@ -18,7 +18,7 @@ def list_lists(request: Request) -> Response:
     all_lists = lists.all()
 
     for list in all_lists:
-        list['date'] = datetime.strftime(list['date'], r'%A, %B %-m, %Y')
+        list['date'] = datetime.strftime(list['date'], r'%A, %B %-d, %Y')
 
     return templates.TemplateResponse(
         request=request,
@@ -33,12 +33,6 @@ def list_lists(request: Request) -> Response:
 # figure out if the parameter is a UUID
 @router.get('/new')
 def new_form(request: Request) -> Response:
-    names = []
-    ids = []
-    for recipe in recipes.all():
-        names.append(recipe['name'])
-        ids.append(recipe['id'])
-
     current_summary = ', '.join(f'{item['amount']}x {item['name']}' for item in quick.current())
 
     return templates.TemplateResponse(
@@ -46,8 +40,7 @@ def new_form(request: Request) -> Response:
         name='new.html',
         context={
             'quick_items': current_summary,
-            'recipe_names': names,
-            'recipe_ids': ids
+            'recipes': recipes.all()
         }
     )
 
@@ -84,11 +77,6 @@ def add(date: Annotated[str, Form()],
 @router.post('/confirm_stocked_and_arbitrary')
 def confirm_stocked(date: Annotated[str, Form()], included: Annotated[list[str], Form()],
                     scales: Annotated[list[float], Form()], request: Request) -> Response:
-    ids = []
-    names = []
-    for id, name in recipes.stocked([UUID(recipe) for recipe in included]):
-        ids.append(id)
-        names.append(name)
     return templates.TemplateResponse(
         request=request,
         name='confirm_stocked_and_arbitrary.html',
@@ -96,8 +84,7 @@ def confirm_stocked(date: Annotated[str, Form()], included: Annotated[list[str],
             'date': date,
             'recipes': included,
             'scales': scales,
-            'ids': ids,
-            'names': names
+            'stocked_ingredients': recipes.stocked([UUID(recipe) for recipe in included])
         }
     )
 
@@ -110,7 +97,10 @@ def shopping(id: str, request: Request) -> Response:
         name='shopping.html',
         context={
             'date': datetime.strftime(shopping_list.date, '%A, %B %-m, %Y'),
-            'aisles': shopping_list.aisles
+            'aisles': shopping_list.aisles,
+            'recipes_included': ', '.join(
+                f'{recipe.name} @ {recipe.scape}x' for recipe in shopping_list.recipes_included
+            )
         }
     )
 

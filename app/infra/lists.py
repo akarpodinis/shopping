@@ -145,9 +145,16 @@ class ShoppingListAisle:
 
 
 @dataclass
+class IncludedRecipe:
+    name: str
+    scape: float
+
+
+@dataclass
 class ShoppingList:
     date: datetime
     aisles: list[ShoppingListAisle]
+    recipes_included: list[str]
 
 
 def for_shopping(id: UUID) -> ShoppingList:
@@ -169,7 +176,13 @@ def for_shopping(id: UUID) -> ShoppingList:
             else:
                 aisles[item.aisle].items += [new_list_item]
 
-    return ShoppingList(list_date, list(aisles.values()))
+        included_recipes = []
+
+        for included_recipe in conn.execute(
+                list_recipes.select().where(list_recipes.c.list == id)).mappings().all():
+            included_recipes += [IncludedRecipe(included_recipe.name, included_recipe.scale)]
+
+    return ShoppingList(list_date, list(aisles.values()), included_recipes)
 
 
 def latest() -> list[dict[str, Any]]:
