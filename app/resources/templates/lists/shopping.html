@@ -13,8 +13,8 @@
         <h2>{{aisle.name}}</h2>
         {% for item in aisle.items %}
         <div>
-            <input id="{{loop.index0}}" class="check" type="checkbox" name="{{field}}"/>
-            <label class="proper-word" for="{{loop.index0}}">{{item.amount}} {{item.name}}</label>
+            <input id="{{aisle.name}}-{{loop.index0}}" class="check" type="checkbox" name="{{field}}"/>
+            <label class="proper-word" for="{{aisle.name}}-{{loop.index0}}">{{item.amount}} {{item.name}}</label>
         </div>
         {% endfor %}
     </div>
