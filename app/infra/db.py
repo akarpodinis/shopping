@@ -82,7 +82,7 @@ quick_items = Table(
     'quick_items',
     metadata,
     Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
-    Column('name', String, nullable=False),
+    Column('name', CITEXT, nullable=False),
     Column('aisle', String, nullable=False),
     Column('amount', Float, nullable=False, default=0),
     Column('added_at', DateTime, nullable=True),
