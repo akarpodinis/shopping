@@ -33,7 +33,7 @@ def list_lists(request: Request) -> Response:
 # figure out if the parameter is a UUID
 @router.get('/new')
 def new_form(request: Request) -> Response:
-    current_summary = ', '.join(f'{item['amount']}x {item['name']}' for item in quick.current())
+    current_summary = ', '.join(f'{item.amount}x {item.name}' for item in quick.current())
 
     return templates.TemplateResponse(
         request=request,
@@ -49,6 +49,7 @@ def new_form(request: Request) -> Response:
 def add(date: Annotated[str, Form()],
         recipes: Annotated[list[str], Form()],
         scales: Annotated[list[str], Form()],
+        include_quick_items: Annotated[bool, Form()] = False,
         include_ingredients: Annotated[list[str], Form()] = [],
         arbitrary_names: Annotated[list[str], Form()] = [],
         arbitrary_aisles: Annotated[list[str], Form()] = [],
@@ -63,6 +64,13 @@ def add(date: Annotated[str, Form()],
             continue
         arbitrary_items.append((name, arbitrary_aisles[index], int(arbitrary_amounts[index])))
 
+    if include_quick_items:
+        for quick_item in quick.current():
+            arbitrary_items.append(
+                (quick_item.name, quick_item.aisle, quick_item.amount))
+
+        quick.delete_all()
+
     added_list = lists.add(
         datetime.strptime(date, r'%Y-%m-%d'),
         dict(zip([UUID(recipe) for recipe in recipes], [float(scale) for scale in scales])),
@@ -75,8 +83,11 @@ def add(date: Annotated[str, Form()],
 
 
 @router.post('/confirm_stocked_and_arbitrary')
-def confirm_stocked(date: Annotated[str, Form()], included: Annotated[list[str], Form()],
-                    scales: Annotated[list[float], Form()], request: Request) -> Response:
+def confirm_stocked(request: Request,
+                    date: Annotated[str, Form()],
+                    included: Annotated[list[str], Form()],
+                    scales: Annotated[list[float], Form()],
+                    include_quick_items: Annotated[bool, Form()] = False) -> Response:
     return templates.TemplateResponse(
         request=request,
         name='confirm_stocked_and_arbitrary.html',
@@ -84,6 +95,7 @@ def confirm_stocked(date: Annotated[str, Form()], included: Annotated[list[str],
             'date': date,
             'recipes': included,
             'scales': scales,
+            'include_quick_items': include_quick_items,
             'stocked_ingredients': recipes.stocked([UUID(recipe) for recipe in included])
         }
     )

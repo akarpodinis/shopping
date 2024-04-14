@@ -16,6 +16,7 @@
     <form action="/lists" method="POST">
         <!-- Hidden input to pass transient data onto the list resource creation -->
         <input type="hidden" name="date" value="{{date}}" />
+        <input type="hidden" name="include_quick_items" value="{{include_quick_items}}" />
         {% for recipe in recipes %}
         <input type="hidden" name="recipes" value="{{recipe}}" />
         {% endfor %}

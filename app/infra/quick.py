@@ -1,8 +1,9 @@
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
 from psycopg.errors import UniqueViolation
-from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
 from app.infra.db import engine, quick_items
@@ -10,6 +11,15 @@ from app.infra.db import engine, quick_items
 
 class DuplicateQuickItemError(Exception):
     pass
+
+
+@dataclass
+class QuickItem:
+    id: UUID
+    name: str
+    aisle: str
+    amount: int
+    added_at: datetime
 
 
 def add(items: list[str], aisles: list[str], amounts: list[int]) -> None:
@@ -42,15 +52,24 @@ def delete(id: UUID) -> dict[str, Any]:
 
         conn.commit()
 
-    return dict(deleted)
+    return dict(QuickItem(**deleted))
 
 
-def current() -> list[dict[str, Any]]:
+def current() -> list[QuickItem]:
     with engine.connect() as conn:
         return [
-            dict(item) for item in
+            QuickItem(**item) for item in
             conn.execute(
                 quick_items.select()
                 .order_by(quick_items.c.added_at.desc())
             ).mappings().all()
         ]
+
+
+def delete_all() -> None:
+    with engine.connect() as conn:
+        conn.execute(
+            quick_items.delete()
+        )
+
+        conn.commit()
