@@ -296,6 +296,6 @@ input[type=submit], button[type=submit] {
     .check:checked + label::after {
         background-size: 25px 25px;
         height: 35px;
-        width: 35px;    
+        width: 37px;    
     }
 }
