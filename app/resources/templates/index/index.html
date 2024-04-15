@@ -15,7 +15,7 @@
     <h2>Today's lists</h2>
     <ol>
         {% for list in recent_lists %}
-        <li> <a href="/lists/{{list.id}}/shopping">{{list.date}}</a> </li>
+        <li> <a href="/lists/{{list.id}}/shopping">{{list.display_date}}</a> </li>
         {% endfor %}
     </ol>
     <br />

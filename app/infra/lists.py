@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func, label, or_, select
@@ -11,14 +10,24 @@ from app.infra.db import (
 )
 
 
-def all() -> list[dict[str, Any]]:
+@dataclass
+class List:
+    id: UUID
+    date: datetime
+
+    @property
+    def display_date(self) -> str:
+        return datetime.strftime(self.date, r'%A, %B %-d')
+
+
+def all() -> list[List]:
     with engine.connect() as conn:
         all_lists = conn.execute(lists.select().order_by(lists.c.date.desc())).mappings().all()
 
-    return [dict(one_list) for one_list in all_lists]
+    return [List(**one_list) for one_list in all_lists]
 
 
-def past_recipes(count: int) -> list[dict[str, Any]]:
+def past_recipes(count: int) -> list[List]:
     with engine.connect() as conn:
         """select distinct on (lr.name) l.date, lr.name from lists_recipes lr
             join lists as l on l.id = lr.list
@@ -34,7 +43,7 @@ def past_recipes(count: int) -> list[dict[str, Any]]:
 
         past_recipes = conn.execute(query).mappings().all()
 
-    return [dict(recipe) for recipe in past_recipes]
+    return [List(**recipe) for recipe in past_recipes]
 
 
 def add(date: datetime, recipe_scales: dict[UUID, float], included_ingredients: list[UUID],
@@ -185,7 +194,7 @@ def for_shopping(id: UUID) -> ShoppingList:
     return ShoppingList(list_date, list(aisles.values()), included_recipes)
 
 
-def latest() -> list[dict[str, Any]]:
+def latest() -> list[List]:
     with engine.connect() as conn:
         latest = conn.execute(
             select(lists)
@@ -195,4 +204,4 @@ def latest() -> list[dict[str, Any]]:
             .order_by(lists.c.date)
         ).mappings().all()
 
-    return latest
+    return [List(**latest_list) for latest_list in latest]
