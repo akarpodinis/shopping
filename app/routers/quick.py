@@ -24,7 +24,7 @@ def delete_quick_item(id: str, request: Request) -> Response:
 
     current_quick_items = current()
 
-    message = f'Deleted quick item {deleted['name']}'
+    message = f'Deleted quick item {deleted.name}'
 
     return templates.TemplateResponse(
         request=request,
