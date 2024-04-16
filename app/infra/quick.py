@@ -43,7 +43,7 @@ def add(items: list[str], aisles: list[str], amounts: list[int]) -> None:
             raise
 
 
-def delete(id: UUID) -> dict[str, Any]:
+def delete(id: UUID) -> QuickItem:
     with engine.connect() as conn:
         deleted = conn.execute(
             quick_items.delete().where(quick_items.c.id == id)
@@ -52,7 +52,7 @@ def delete(id: UUID) -> dict[str, Any]:
 
         conn.commit()
 
-    return dict(QuickItem(**deleted))
+    return QuickItem(**deleted)
 
 
 def current() -> list[QuickItem]:
