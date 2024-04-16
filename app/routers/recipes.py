@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.infra.ingredients import names_and_ids
 from app.infra.recipes import (
-    DuplicateRecipeError, RecipeDoesNotExistError, add, all, editable, one, update
+    DuplicateRecipeError, RecipeDoesNotExistError, add, all, editable, update
 )
 from app.routers.responses import UUIDJSONResponse
 
@@ -49,23 +49,6 @@ def list_page(request: Request, message: str = '') -> Response:
             'message': message
         }
     )
-
-
-@router.get('/{id}')
-def get_one(id: str) -> Response:
-    try:
-        converted_id = UUID(id)
-        if not converted_id.version or not converted_id.version == 4:
-            raise ValueError
-    except ValueError:
-        return Response(content='id in path should be a UUID', status_code=422)
-
-    try:
-        recipe = one(id)
-    except RecipeDoesNotExistError:
-        return Response(status_code=404)
-    else:
-        return UUIDJSONResponse(content=recipe, status_code=200)
 
 
 @router.get('/{id}/edit')

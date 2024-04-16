@@ -10,38 +10,22 @@ from sqlalchemy.exc import IntegrityError
 from app.infra.db import engine, ingredients, ingredients_recipes, recipe_notes, recipes
 
 
-def all() -> list[dict[str, Any]]:
+@dataclass
+class Recipe:
+    id: UUID
+    name: str
+    servings: int
+    routine: bool
+
+
+def all() -> list[Recipe]:
     with engine.connect() as conn:
-        return [dict(ingredient) for ingredient
+        return [Recipe(**recipe) for recipe
                 in conn.execute(recipes.select()).mappings().all()]
 
 
 class RecipeDoesNotExistError(Exception):
     pass
-
-
-def one(id: UUID) -> dict[str, Any]:
-    with engine.connect() as conn:
-        recipe = conn.execute(recipes.select().where(recipes.c.id == id)).mappings().first()
-        if not recipe:
-            raise RecipeDoesNotExistError
-
-        sel = select(ingredients.c.name, ingredients.c.id, ingredients_recipes.c.amount)
-        sel = sel.select_from(ingredients
-                              .join(ingredients_recipes,
-                                    ingredients_recipes.c.ingredient == ingredients.c.id)
-                              .join(recipes,
-                                    recipes.c.id == ingredients_recipes.c.recipe))
-        sel = sel.where(recipes.c.id == id)
-        rows = conn.execute(sel).mappings().all()
-
-        return {
-            'id': recipe.id,
-            'routine': recipe.routine,
-            'name': recipe.name,
-            'servings': recipe.servings,
-            'ingredients': [dict(row) for row in rows]
-        }
 
 
 def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, int]],
@@ -94,10 +78,7 @@ class EditableIngredient:
 
 
 @dataclass
-class EditableRecipe:
-    name: str
-    routine: bool
-    servings: int
+class EditableRecipe(Recipe):
     ingredients: list[EditableIngredient]
     notes: str
 
@@ -132,6 +113,7 @@ def editable(id: UUID) -> EditableRecipe:
         ).mappings().all()
 
     return EditableRecipe(
+        recipe.id,
         recipe.name,
         recipe.routine,
         recipe.servings,
