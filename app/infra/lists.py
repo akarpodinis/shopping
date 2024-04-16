@@ -11,13 +11,17 @@ from app.infra.db import (
 
 
 @dataclass
-class List:
-    id: UUID
+class DisplayableDate:
     date: datetime
 
     @property
     def display_date(self) -> str:
         return datetime.strftime(self.date, r'%A, %B %-d')
+
+
+@dataclass
+class List(DisplayableDate):
+    id: UUID
 
 
 def all() -> list[List]:
@@ -27,7 +31,12 @@ def all() -> list[List]:
     return [List(**one_list) for one_list in all_lists]
 
 
-def past_recipes(count: int) -> list[List]:
+@dataclass
+class HistoricalList(DisplayableDate):
+    name: str
+
+
+def past_recipes(count: int) -> list[HistoricalList]:
     with engine.connect() as conn:
         """select distinct on (lr.name) l.date, lr.name from lists_recipes lr
             join lists as l on l.id = lr.list
@@ -43,7 +52,7 @@ def past_recipes(count: int) -> list[List]:
 
         past_recipes = conn.execute(query).mappings().all()
 
-    return [List(**recipe) for recipe in past_recipes]
+    return [HistoricalList(**recipe) for recipe in past_recipes]
 
 
 def add(date: datetime, recipe_scales: dict[UUID, float], included_ingredients: list[UUID],

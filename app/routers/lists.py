@@ -116,12 +116,10 @@ def shopping(id: str, request: Request) -> Response:
 
 @router.get('/recent')
 def recent(request: Request, count: int = 5) -> Response:
-    historical_lists = lists.past_recipes(count)
-
     return templates.TemplateResponse(
         request=request,
         name='inspiration.html',
         context={
-            'recipe_names': [historical_list['name'] for historical_list in historical_lists]
+            'recipes': lists.past_recipes(count)
         }
     )
