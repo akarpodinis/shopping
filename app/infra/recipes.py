@@ -14,8 +14,8 @@ from app.infra.db import engine, ingredients, ingredients_recipes, recipe_notes,
 class Recipe:
     id: UUID
     name: str
-    servings: int
     routine: bool
+    servings: int
 
 
 def all() -> list[Recipe]:
