@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import CITEXT, UUID
 
 database_url = re.sub('postgres(?:ql)?:', 'postgresql+psycopg:', os.environ['DATABASE_URL'])
 
-engine = sa.create_engine(database_url)
+engine = sa.create_engine(database_url, pool_pre_ping=True)
 
 metadata = sa.MetaData()
 metadata.bind = engine
