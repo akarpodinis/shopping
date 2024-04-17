@@ -1,12 +1,15 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
 from uuid import UUID
 
 from psycopg.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 
 from app.infra.db import engine, quick_items
+
+
+class QuickItemNotFoundError(Exception):
+    pass
 
 
 class DuplicateQuickItemError(Exception):
@@ -51,6 +54,9 @@ def delete(id: UUID) -> QuickItem:
         ).mappings().first()
 
         conn.commit()
+
+    if not deleted:
+        raise QuickItemNotFoundError
 
     return QuickItem(**deleted)
 
