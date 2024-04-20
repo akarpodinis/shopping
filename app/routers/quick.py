@@ -6,7 +6,8 @@ from fastapi import APIRouter, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.infra.quick import add, current, delete, DuplicateQuickItemError, QuickItemNotFoundError
+from app.infra import aisles
+from app.infra.quick import DuplicateQuickItemError, QuickItemNotFoundError, add, current, delete
 
 router = APIRouter(prefix='/quick')
 
@@ -40,6 +41,7 @@ def quick_form(request: Request, message: str = '') -> Response:
         request=request,
         name='quick.html',
         context={
+            'aisle_names': aisles.all(),
             'message': message,
             'current': current_quick_items if current_quick_items else []
         }
@@ -74,6 +76,7 @@ def new_quick(quick_items: Annotated[list[str], Form()],
         request=request,
         name='quick.html',
         context={
+            'aisle_names': aisles.all(),
             'message': message,
             'current': current_quick_items if current_quick_items else []
         }

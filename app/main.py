@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import index, ingredients, quick, lists, recipes
+from app.routers import index, ingredients, lists, quick, recipes
 
 app = FastAPI()
 

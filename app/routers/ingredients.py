@@ -6,9 +6,9 @@ from fastapi import APIRouter, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from app.infra import aisles
 from app.infra.ingredients import (
-    DuplicateIngredientError, add, all, delete, edit_template_configuration,
-    new_template_configuration, one, update
+    DuplicateIngredientError, add, all, delete, edit_template_configuration, one, update
 )
 from app.routers.responses import UUIDJSONResponse
 
@@ -25,11 +25,14 @@ def list_ingredients() -> Response:
 # Ordering matters here.  I want the router to check /ingredients/new on GET before trying to
 # figure out if the parameter is a UUID
 @router.get('/new')
-def new_form(request: Request):
+def new_form(request: Request, message: str = ''):
     return templates.TemplateResponse(
         request=request,
         name='new.html',
-        context=new_template_configuration()
+        context={
+            'aisle_names': aisles.all(),
+            'message': message
+        }
     )
 
 
@@ -121,8 +124,16 @@ def edit_form(id: str, request: Request) -> Response:
     except ValueError:
         return Response(content='id in path should be a UUID', status_code=422)
 
+    ingredient = one(converted_id)
+
     return templates.TemplateResponse(
         request=request,
         name='edit.html',
-        context=edit_template_configuration(id)
+        context={
+            'id': converted_id,
+            'name': ingredient['name'],
+            'aisle': ingredient['aisle'],
+            'stocked': ingredient['stocked'],
+            'aisle_names': aisles.all()
+        }
     )

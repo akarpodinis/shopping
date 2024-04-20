@@ -25,9 +25,16 @@
     <h2>New quick items</h2>
     <form action="/quick/list" method="POST">
         {% for i in range(1, 5) %}
-        <div>Name:<input type="text" name="quick_items" />Aisle:<input type="text" name="quick_aisles" />Amount:<input type="text" name="quick_amounts"></div>
+        <div>
+            Name:<input type="text" name="quick_items" required />Aisle:<input list="aisle-names" name="quick_aisles" autocomplete="off" required />Amount:<input type="text" name="quick_amounts" required />
+        </div>
         <br />
         {% endfor %}
+        <datalist id="aisle-names">
+            {% for aisle_name in aisle_names %}
+            <option value="{{aisle_name}}"></option>
+            {% endfor %}
+        </datalist>
         <div><input type="submit" value="Save for later"></div>
     </form>
 </body>

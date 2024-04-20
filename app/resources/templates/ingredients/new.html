@@ -8,20 +8,25 @@
 <body>
     <div class="sticky-heading"><a href="/">Home</a></div>
     <h1>New Ingredient</h1>
+    <div class="quick-status">{{message}}</div>
+    <br />
     <form action="/ingredients" method="POST">
-        {% for field in fields %}
-            {% if types[loop.index0] == "checkbox" %}
-            <input id="{{loop.index0}}" class="check" type="{{types[loop.index0]}}" name="{{field}}" {{required[loop.index0]}}/>
-            <label class="proper-word-for-status" for="{{loop.index0}}">{{field}}</label>
-            {% else %}
-            <div><label class="proper-word">{{field}}</label><input type="{{types[loop.index0]}}" name="{{field}}" {{required[loop.index0]}}/></div>
-            {% endif %}
-            <br />
+        <div><label class="proper-word">Name</label><input type="text" name="name" required /></div>
+        <br />
+        <div><label class="proper-word">Aisle</label><input list="aisle_names" name="aisle" autocomplete="off" required /></div>
+        <br />
+        <input id="stocked-input" class="check" type="checkbox" name="stocked" />
+        <label class="proper-word-for-status" for="stocked-input">Stocked</label>
+        <br />
+        <div class="multiple-submit-buttons">
+            <button type="submit" name="submit_button" value="done">Add one and done</button>
+            <button type="submit" name="submit_button" value="more">Add one and add another</button>
+        </div>
+        <datalist id="aisle_names">
+            {% for aisle_name in aisle_names %}
+            <option value="{{aisle_name}}"></option>
             {% endfor %}
-            <div class="multiple-submit-buttons">
-                <button type="submit" name="submit_button" value="done">Add one and done</button>
-                <button type="submit" name="submit_button" value="more">Add one and add another</button>
-            </div>
-    </form>
-</body>
-</html>
+        </datalist>
+        </form>
+    </body>
+    </html>
