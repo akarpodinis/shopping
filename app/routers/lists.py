@@ -101,7 +101,7 @@ def confirm_stocked(request: Request,
 
 @router.get('/{id}/shopping', dependencies=[Depends(check_id)])
 def shopping(id: UUID, request: Request) -> Response:
-    shopping_list = lists.for_shopping(UUID(id))
+    shopping_list = lists.for_shopping(id)
     return templates.TemplateResponse(
         request=request,
         name='shopping.html',
