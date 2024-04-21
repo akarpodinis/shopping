@@ -2,10 +2,11 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Form, Request, Response
+from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from app.routers import check_id
 from app.infra import lists, quick, recipes
 
 router = APIRouter(prefix='/lists')
@@ -98,8 +99,8 @@ def confirm_stocked(request: Request,
     )
 
 
-@router.get('/{id}/shopping')
-def shopping(id: str, request: Request) -> Response:
+@router.get('/{id}/shopping', dependencies=[Depends(check_id)])
+def shopping(id: UUID, request: Request) -> Response:
     shopping_list = lists.for_shopping(UUID(id))
     return templates.TemplateResponse(
         request=request,
