@@ -26,7 +26,7 @@
     <form action="/quick/list" method="POST">
         {% for i in range(1, 5) %}
         <div>
-            Name:<input type="text" name="quick_items" required />Aisle:<input list="aisle-names" name="quick_aisles" autocomplete="off" required />Amount:<input type="text" name="quick_amounts" required />
+            Name:<input type="text" name="quick_items" />Aisle:<input list="aisle-names" name="quick_aisles" autocomplete="off" />Amount:<input type="text" name="quick_amounts" />
         </div>
         <br />
         {% endfor %}

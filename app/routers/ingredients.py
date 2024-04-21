@@ -6,9 +6,9 @@ from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.routers import check_id
 from app.infra import aisles
 from app.infra.ingredients import DuplicateIngredientError, add, all, delete, one, update
+from app.routers import check_id
 from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/ingredients')
