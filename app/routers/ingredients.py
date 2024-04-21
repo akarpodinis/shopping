@@ -2,14 +2,13 @@ from html import escape
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Form, Request, Response
+from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from app.routers import check_id
 from app.infra import aisles
-from app.infra.ingredients import (
-    DuplicateIngredientError, add, all, delete, edit_template_configuration, one, update
-)
+from app.infra.ingredients import DuplicateIngredientError, add, all, delete, one, update
 from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/ingredients')
@@ -54,15 +53,8 @@ def list_page(request: Request, message: str = '') -> Response:
     )
 
 
-@router.get('/{id}')
-def get_one(id: str) -> Response:
-    try:
-        converted_id = UUID(id)
-        if not converted_id.version or not converted_id.version == 4:
-            raise ValueError
-    except ValueError:
-        return Response(content='id in path should be a UUID', status_code=422)
-
+@router.get('/{id}', dependencies=[Depends(check_id)])
+def get_one(id: UUID) -> Response:
     ingredient = one(id)
     return UUIDJSONResponse(content=ingredient if ingredient else None,
                             status_code=200 if ingredient else 404)
@@ -87,13 +79,13 @@ def new_ingredient(submit_button: Annotated[str, Form()],
 
 # This should be a PATCH but HTML forms don't support that method.
 # So, to work around it, allow POST to /ingredients/{id} :(
-@router.post('/{id}')
-def edit(id: str,
+@router.post('/{id}', dependencies=[Depends(check_id)])
+def edit(id: UUID,
          name: Annotated[str, Form()] = None,
          aisle: Annotated[str, Form()] = None,
          stocked: Annotated[bool, Form()] = False) -> Response:
     try:
-        update(UUID(id), stocked, name, aisle)
+        update(id, stocked, name, aisle)
         message = f'Success, updated ingredient {name}'
     except DuplicateIngredientError:
         message = f'Duplicate ingredient called {name}'
@@ -101,36 +93,20 @@ def edit(id: str,
     return RedirectResponse(f'/ingredients/list?message={escape(message)}', status_code=303)
 
 
-@router.delete('/{id}')
-def delete_one(id: str) -> Response:
-    try:
-        converted_id = UUID(id)
-        if not converted_id.version or not converted_id.version == 4:
-            raise ValueError
-    except ValueError:
-        return Response(content='id in path should be a UUID', status_code=422)
-
+@router.delete('/{id}', dependencies=[Depends(check_id)])
+def delete_one(id: UUID) -> Response:
     delete(id)
-
     return RedirectResponse('/ingredients', status_code=303)
 
 
-@router.get('/{id}/edit')
-def edit_form(id: str, request: Request) -> Response:
-    try:
-        converted_id = UUID(id)
-        if not converted_id.version or not converted_id.version == 4:
-            raise ValueError
-    except ValueError:
-        return Response(content='id in path should be a UUID', status_code=422)
-
-    ingredient = one(converted_id)
-
+@router.get('/{id}/edit', dependencies=[Depends(check_id)])
+def edit_form(id: UUID, request: Request) -> Response:
+    ingredient = one(id)
     return templates.TemplateResponse(
         request=request,
         name='edit.html',
         context={
-            'id': converted_id,
+            'id': id,
             'name': ingredient['name'],
             'aisle': ingredient['aisle'],
             'stocked': ingredient['stocked'],

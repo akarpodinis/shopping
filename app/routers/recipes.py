@@ -2,7 +2,7 @@ from html import escape
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Form, Request, Response
+from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
@@ -10,6 +10,7 @@ from app.infra.ingredients import names_and_ids
 from app.infra.recipes import (
     DuplicateRecipeError, RecipeDoesNotExistError, add, all, editable, update
 )
+from app.routers import check_id
 from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/recipes')
@@ -51,15 +52,8 @@ def list_page(request: Request, message: str = '') -> Response:
     )
 
 
-@router.get('/{id}/edit')
-def edit(id: str, request: Request) -> Response:
-    try:
-        converted_id = UUID(id)
-        if not converted_id.version or not converted_id.version == 4:
-            raise ValueError
-    except ValueError:
-        return Response(content='id in path should be a UUID', status_code=422)
-
+@router.get('/{id}/edit', dependencies=[Depends(check_id)])
+def edit(id: UUID, request: Request) -> Response:
     try:
         recipe = editable(id)
     except RecipeDoesNotExistError:
@@ -82,8 +76,8 @@ def edit(id: str, request: Request) -> Response:
         )
 
 
-@router.post('/{id}/update')
-def update_recipe(id: str,
+@router.post('/{id}/update', dependencies=[Depends(check_id)])
+def update_recipe(id: UUID,
                   name: Annotated[str, Form()],
                   servings: Annotated[int, Form()],
                   ingredient_order: Annotated[str, Form()],

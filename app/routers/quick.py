@@ -2,27 +2,21 @@ from html import escape
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Form, Request, Response
+from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.infra import aisles
 from app.infra.quick import DuplicateQuickItemError, QuickItemNotFoundError, add, current, delete
+from app.routers import check_id
 
 router = APIRouter(prefix='/quick')
 
 templates = Jinja2Templates(directory='app/resources/templates/lists')
 
 
-@router.get('/{id}/delete')
-def delete_quick_item(id: str, request: Request, response: Response) -> Response:
-    try:
-        converted_id = UUID(id)
-        if not converted_id.version or not converted_id.version == 4:
-            raise ValueError
-    except ValueError:
-        return Response(content='id in path should be a UUID', status_code=422)
-
+@router.get('/{id}/delete', dependencies=[Depends(check_id)])
+def delete_quick_item(id: UUID) -> Response:
     try:
         deleted = delete(id)
         message = f'Deleted quick item {deleted.name}'
