@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.routers import check_id
 from app.infra import lists, quick, recipes
+from app.routers import check_id
 
 router = APIRouter(prefix='/lists')
 
