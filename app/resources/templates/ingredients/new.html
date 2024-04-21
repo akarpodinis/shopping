@@ -15,7 +15,15 @@
         <br />
         <div><label class="proper-word">Aisle</label><input list="aisle_names" name="aisle" autocomplete="off" required /></div>
         <br />
+        <!-- 
+            So I don't forget later, setting "checked" in-line in a tag with jinja isn't possible
+            so use control statements to insert a whole tag instead :(
+        -->
+        {% if stocked %}
+        <input id="stocked-input" class="check" type="checkbox" name="stocked" checked />
+        {% else %}
         <input id="stocked-input" class="check" type="checkbox" name="stocked" />
+        {% endif %}
         <label class="proper-word-for-status" for="stocked-input">Stocked</label>
         <br />
         <div class="multiple-submit-buttons">
