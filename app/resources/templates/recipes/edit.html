@@ -11,7 +11,7 @@
     <form action="/recipes/{{id}}/update" method="POST">
         <input type="hidden" name="ingredient_order" value="{{ingredient_order}}" />
         <p>Name <input type="text" name="name" pattern="^[^ ].+[^ ]$" value="{{name}}" required /></p>
-        <p>Servings <input type="number" min="1" name="servings" value="{{servings}}" required /></p>
+        <p>Servings <input type="text" inputmode="number" min="1" name="servings" value="{{servings}}" required /></p>
         <div class="input-line">
             <input id="routine-check" class="check" type="checkbox" name="is_routine" {{already_routine}}/>
             <label class="proper-word-for-status" for="routine-check">Routine</label>
@@ -19,7 +19,7 @@
         <h2>Ingredients</h2>
         {% for ingredient in ingredients %}
         <div class="input-line">
-            <label class="recipe-ingredient-label">{{ingredient.name}}</label><label class="recipe-name-label">Amount</label><input class="check-and-scale-scale-text" type="text" name="amounts" value="{{ingredient.amount}}"/></li>
+            <label class="recipe-ingredient-label">{{ingredient.name}}</label><label class="recipe-name-label">Amount</label><input class="check-and-scale-scale-text" type="text" inpumode="numeric" name="amounts" value="{{ingredient.amount}}"/></li>
         </div>
         {% endfor %}
         <h2>Notes</h2>

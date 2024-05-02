@@ -10,7 +10,7 @@
     <h1>New Recipe</h1>
     <form action="/recipes" method="POST">
         <p>Name <input type="text" name="name" pattern="^[^ ].+[^ ]$" required /></p>
-        <p>Servings <input type="number" min="1" name="servings" value="1" required /></p>
+        <p>Servings <input type="text" inputmode="numeric" min="1" name="servings" value="1" required /></p>
         <div class="input-line">
             <input id="routine-check" class="check" type="checkbox" name="is_routine" {{already_routine}}/>
             <label class="proper-word-for-status" for="routine-check">Routine</label>
@@ -20,7 +20,7 @@
         <div class="input-line">
             <input id="{{loop.index0}}" class="check" type="checkbox" name="{{ids[loop.index0]}}||selected" />
             <label class="recipe-name-label" for="{{loop.index0}}">{{name}}</label>
-            <input class="check-and-scale-scale-text" type="text" name="{{ids[loop.index0]}}||amount" /><label class="recipe-name-label">Amount</label>
+            <input class="check-and-scale-scale-text" type="text" inputmode="numeric" name="{{ids[loop.index0]}}||amount" /><label class="recipe-name-label">Amount</label>
         </div>
         <br />
         {% endfor %}

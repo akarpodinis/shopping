@@ -33,7 +33,7 @@
             {% else %}
             <input class="check" id="{{loop.index0}}" type="checkbox" name="included" value="{{recipe.id}}" />
             {% endif %}
-            <label class="recipe-name-label" for="{{loop.index0}}">{{recipe.name}}</label> <label class="recipe-name-label">Scale</label> <input class="check-and-scale-scale-text" type="text" name="scales" value="1.0" />
+            <label class="recipe-name-label" for="{{loop.index0}}">{{recipe.name}}</label> <label class="recipe-name-label">Scale</label> <input class="check-and-scale-scale-text" type="text" inputmode="numeric" name="scales" value="1.0" />
         </div>
         <br />
         {% endfor %}
