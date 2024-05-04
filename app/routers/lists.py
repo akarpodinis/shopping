@@ -1,4 +1,5 @@
 from datetime import datetime
+from html import escape
 from typing import Annotated
 from uuid import UUID
 
@@ -30,13 +31,14 @@ def list_lists(request: Request) -> Response:
 # Ordering matters here.  I want the router to check /ingredients/new on GET before trying to
 # figure out if the parameter is a UUID
 @router.get('/new')
-def new_form(request: Request) -> Response:
+def new_form(request: Request, message: str = '') -> Response:
     current_summary = ', '.join(f'{item.amount}x {item.name}' for item in quick.current())
 
     return templates.TemplateResponse(
         request=request,
         name='new.html',
         context={
+            'message': message,
             'quick_items': current_summary,
             'recipes': recipes.all()
         }
@@ -45,8 +47,8 @@ def new_form(request: Request) -> Response:
 
 @router.post('')
 def add(date: Annotated[str, Form()],
-        recipes: Annotated[list[str], Form()],
-        scales: Annotated[list[str], Form()],
+        recipes: Annotated[list[str], Form()] = [],
+        scales: Annotated[list[str], Form()] = [],
         include_quick_items: Annotated[bool, Form()] = False,
         include_ingredients: Annotated[list[str], Form()] = [],
         arbitrary_names: Annotated[list[str], Form()] = [],
@@ -69,12 +71,16 @@ def add(date: Annotated[str, Form()],
 
         quick.delete_all()
 
-    added_list = lists.add(
-        datetime.strptime(date, r'%Y-%m-%d'),
-        dict(zip([UUID(recipe) for recipe in recipes], [float(scale) for scale in scales])),
-        [UUID(ingredient) for ingredient in include_ingredients],
-        arbitrary_items
-    )
+    try:
+        added_list = lists.add(
+            datetime.strptime(date, r'%Y-%m-%d'),
+            dict(zip([UUID(recipe) for recipe in recipes], [float(scale) for scale in scales])),
+            [UUID(ingredient) for ingredient in include_ingredients],
+            arbitrary_items
+        )
+    except lists.NoItemsToMakeAListError:
+        message = 'Pick some things to make a list'
+        return RedirectResponse(f'/lists/new?message={escape(message)}', status_code=303)
 
     # Redirect to shopping list page
     return RedirectResponse(f'/lists/{added_list}/shopping', status_code=303)
@@ -83,13 +89,15 @@ def add(date: Annotated[str, Form()],
 @router.post('/confirm_stocked_and_arbitrary')
 def confirm_stocked(request: Request,
                     date: Annotated[str, Form()],
-                    included: Annotated[list[str], Form()],
-                    scales: Annotated[list[float], Form()],
-                    include_quick_items: Annotated[bool, Form()] = False) -> Response:
+                    included: Annotated[list[str], Form()] = [],
+                    scales: Annotated[list[float], Form()] = [],
+                    include_quick_items: Annotated[bool, Form()] = False,
+                    message: str = '') -> Response:
     return templates.TemplateResponse(
         request=request,
         name='confirm_stocked_and_arbitrary.html',
         context={
+            'message': message,
             'date': date,
             'recipes': included,
             'scales': scales,

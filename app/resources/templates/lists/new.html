@@ -8,6 +8,8 @@
 <body>
     <div class="sticky-heading"><a href="/">Home</a></div>
     <h1>New Shopping List</h1>
+    <div class="quick-status">{{message}}</div>
+    <br />
     <form action="/lists/confirm_stocked_and_arbitrary" method="POST">
         <div class="shopping-date"><label>Shopping on </label><input type="date" name="date" required /></div>
         {% if quick_items|length > 0 %}

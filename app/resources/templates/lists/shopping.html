@@ -20,7 +20,11 @@
     </div>
     {% endfor %}
     <br />
+    {% if recipes_included|length > 0 %}
     <h3>Recipes included</h3>
     <div class="quick-item-summary">{{recipes_included}}</div>
+    {% else %}
+    <div class="quick-item-summary">No recipes included in this list</div>
+    {% endif %}
 </body>
 </html>
