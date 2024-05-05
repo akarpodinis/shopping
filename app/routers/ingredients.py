@@ -9,16 +9,10 @@ from fastapi.templating import Jinja2Templates
 from app.infra import aisles
 from app.infra.ingredients import DuplicateIngredientError, add, all, delete, one, update
 from app.routers import check_id
-from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/ingredients')
 
 templates = Jinja2Templates(directory='app/resources/templates/ingredients')
-
-
-@router.get('')
-def list_ingredients() -> Response:
-    return UUIDJSONResponse(content=all())
 
 
 # Ordering matters here.  I want the router to check /ingredients/new on GET before trying to
@@ -51,13 +45,6 @@ def list_page(request: Request, message: str = '') -> Response:
                             for ingredient in ingredients]
         }
     )
-
-
-@router.get('/{id}', dependencies=[Depends(check_id)])
-def get_one(id: UUID) -> Response:
-    ingredient = one(id)
-    return UUIDJSONResponse(content=ingredient if ingredient else None,
-                            status_code=200 if ingredient else 404)
 
 
 @router.post('')
