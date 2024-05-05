@@ -117,7 +117,7 @@ def shopping(id: UUID, request: Request) -> Response:
             'date': datetime.strftime(shopping_list.date, '%A, %B %-m, %Y'),
             'aisles': shopping_list.aisles,
             'recipes_included': ', '.join(
-                f'{recipe.name} @ {recipe.scape}x' for recipe in shopping_list.recipes_included
+                f'{recipe.name} @ {recipe.scale}x' for recipe in shopping_list.recipes_included
             )
         }
     )
