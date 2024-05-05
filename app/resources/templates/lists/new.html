@@ -27,8 +27,14 @@
         {% for recipe in recipes %}
         <div class="input-line">
             <!-- 
-                So I don't forget later, setting "checked" in-line in a tag with jinja isn't possible
-                so use control statements to insert a whole tag instead :(
+                Include all the available recipe IDs so we can match amount indexes to included
+                recipe indexes.  All amounts are sent to the server when the form is submitted, but
+                not all of the recipe IDs, because not-checked checkboxes aren't submitted.
+            -->
+            <input type="hidden" name="available" value="{{recipe.id}}" />
+            <!-- 
+                So I don't forget later, setting "checked" in-line in a tag with jinja isn't
+                possible so use control statements to insert a whole tag instead :(
             -->
             {% if recipe.routine %}
             <input class="check" id="{{loop.index0}}" type="checkbox" name="included" value="{{recipe.id}}" checked />

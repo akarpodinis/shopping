@@ -48,10 +48,10 @@ def new_form(request: Request, message: str = '') -> Response:
 
 @router.post('')
 def add(date: Annotated[str, Form()],
-        recipes: Annotated[list[str], Form()] = [],
-        scales: Annotated[list[str], Form()] = [],
+        recipes: Annotated[list[UUID], Form()] = [],
+        scales: Annotated[list[float], Form()] = [],
         include_quick_items: Annotated[bool, Form()] = False,
-        include_ingredients: Annotated[list[str], Form()] = [],
+        include_ingredients: Annotated[list[UUID], Form()] = [],
         arbitrary_names: Annotated[list[str], Form()] = [],
         arbitrary_aisles: Annotated[list[str], Form()] = [],
         arbitrary_amounts: Annotated[list[str], Form()] = []) -> Response:
@@ -75,8 +75,8 @@ def add(date: Annotated[str, Form()],
     try:
         added_list = lists.add(
             datetime.strptime(date, r'%Y-%m-%d'),
-            dict(zip([UUID(recipe) for recipe in recipes], [float(scale) for scale in scales])),
-            [UUID(ingredient) for ingredient in include_ingredients],
+            dict(zip([recipe for recipe in recipes], [scale for scale in scales])),
+            include_ingredients,
             arbitrary_items
         )
     except lists.NoItemsToMakeAListError:
@@ -90,10 +90,12 @@ def add(date: Annotated[str, Form()],
 @router.post('/confirm_stocked_and_arbitrary')
 def confirm_stocked(request: Request,
                     date: Annotated[str, Form()],
-                    included: Annotated[list[str], Form()] = [],
+                    available: Annotated[list[UUID], Form()],
+                    included: Annotated[list[UUID], Form()] = [],
                     scales: Annotated[list[float], Form()] = [],
                     include_quick_items: Annotated[bool, Form()] = False,
                     message: str = '') -> Response:
+    chosen_indexes = [available.index(i) for i in included]
     return templates.TemplateResponse(
         request=request,
         name='confirm_stocked_and_arbitrary.html',
@@ -101,9 +103,9 @@ def confirm_stocked(request: Request,
             'message': message,
             'date': date,
             'recipes': included,
-            'scales': scales,
+            'scales': [scales[index] for index in chosen_indexes],
             'include_quick_items': include_quick_items,
-            'stocked_ingredients': recipes.stocked([UUID(recipe) for recipe in included])
+            'stocked_ingredients': recipes.stocked(included)
         }
     )
 
