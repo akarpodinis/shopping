@@ -194,7 +194,7 @@ class ShoppingListAisle:
 @dataclass
 class IncludedRecipe:
     name: str
-    scape: float
+    scale: float
 
 
 @dataclass
