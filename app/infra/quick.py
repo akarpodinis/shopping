@@ -21,7 +21,7 @@ class QuickItem:
     id: UUID
     name: str
     aisle: str
-    amount: int
+    amount: float
     added_at: datetime
 
 
