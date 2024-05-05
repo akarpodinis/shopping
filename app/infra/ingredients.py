@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from dataclasses import dataclass
 from uuid import UUID
 
 from psycopg.errors import UniqueViolation
@@ -8,17 +8,33 @@ from sqlalchemy.exc import IntegrityError
 from app.infra.db import engine, ingredients
 
 
-def all() -> list[dict[str, Any]]:
+@dataclass
+class Ingredient:
+    id: UUID
+    name: str
+    aisle: str
+    stocked: bool
+
+
+def all() -> list[Ingredient]:
     with engine.connect() as conn:
-        return [dict(ingredient) for ingredient
+        return [Ingredient(**ingredient) for ingredient
                 in conn.execute(ingredients.select()).mappings().all()]
 
 
-def one(id: UUID) -> Optional[dict[str, Any]]:
+class IngredientNotFoundError(Exception):
+    pass
+
+
+def one(id: UUID) -> Ingredient:
     with engine.connect() as conn:
         ingredient = conn.execute(
             select(ingredients).where(ingredients.c.id == id)).mappings().first()
-        return dict(ingredient) if ingredient else None
+
+        if not ingredient:
+            raise IngredientNotFoundError
+
+        return Ingredient(**ingredient)
 
 
 class DuplicateIngredientError(Exception):
@@ -85,4 +101,4 @@ def update(id: UUID, stocked: bool, name: str = None, aisle: str = None) -> Ingr
             else:
                 raise
 
-        return dict(updated)
+        return Ingredient(**updated)

@@ -7,7 +7,9 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.infra import aisles
-from app.infra.ingredients import DuplicateIngredientError, add, all, delete, one, update
+from app.infra.ingredients import (
+    DuplicateIngredientError, IngredientNotFoundError, add, all, delete, one, update
+)
 from app.routers import check_id
 
 router = APIRouter(prefix='/ingredients')
@@ -38,11 +40,7 @@ def list_page(request: Request, message: str = '') -> Response:
         name='list.html',
         context={
             'message': message,
-            'ingredients': [(str(ingredient['id']),
-                             ingredient['name'],
-                             ingredient['aisle'],
-                             '(stocked)' if ingredient['stocked'] else '')
-                            for ingredient in ingredients]
+            'ingredients': ingredients
         }
     )
 
@@ -88,15 +86,15 @@ def delete_one(id: UUID) -> Response:
 
 @router.get('/{id}/edit', dependencies=[Depends(check_id)])
 def edit_form(id: UUID, request: Request) -> Response:
-    ingredient = one(id)
-    return templates.TemplateResponse(
-        request=request,
-        name='edit.html',
-        context={
-            'id': id,
-            'name': ingredient['name'],
-            'aisle': ingredient['aisle'],
-            'stocked': ingredient['stocked'],
-            'aisle_names': aisles.all()
-        }
-    )
+    try:
+        ingredient = one(id)
+        return templates.TemplateResponse(
+            request=request,
+            name='edit.html',
+            context={
+                'ingredient': ingredient,
+                'aisle_names': aisles.all()
+            }
+        )
+    except IngredientNotFoundError:
+        return Response(status_code=404)
