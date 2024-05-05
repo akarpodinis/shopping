@@ -65,45 +65,7 @@ def names_and_ids() -> tuple[list[str], list[UUID]]:
     return names, ids
 
 
-def new_template_configuration() -> dict[str, Any]:
-    return {
-        'fields': [
-            ingredients.c.name.name,
-            ingredients.c.aisle.name,
-            ingredients.c.stocked.name
-        ],
-        'types': [
-            'text', 'text', 'checkbox'
-        ],
-        'required': [
-            'required', 'required', ''
-        ]
-    }
-
-
-def edit_template_configuration(id: UUID) -> dict[str, Any]:
-    ingredient = one(id)
-
-    return {
-        'id': str(id),
-        'name': ingredient['name'],
-        'fields': [
-            ingredients.c.name.name,
-            ingredients.c.aisle.name,
-            ingredients.c.stocked.name
-        ],
-        'types': [
-            'text', 'text', 'checkbox'
-        ],
-        'existing': [
-            ingredient['name'],
-            ingredient['aisle'],
-            'checked' if ingredient['stocked'] else ''
-        ]
-    }
-
-
-def update(id: UUID, stocked: bool, name: str = None, aisle: str = None) -> dict[str, Any]:
+def update(id: UUID, stocked: bool, name: str = None, aisle: str = None) -> Ingredient:
     with engine.connect() as conn:
         try:
             values = {}
