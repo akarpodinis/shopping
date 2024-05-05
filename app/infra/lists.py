@@ -96,7 +96,7 @@ def add_recipe_items(list_id: UUID,
                 ingredients.c.id,
                 ingredients.c.name,
                 ingredients.c.aisle,
-                label('amount', func.ceil(ingredients_recipes.c.amount * recipe_scales[recipe]))
+                label('amount', (ingredients_recipes.c.amount * recipe_scales[recipe]))
             )
             .join(ingredients_recipes, ingredients_recipes.c.ingredient == ingredients.c.id)
             .join(recipes, recipes.c.id == ingredients_recipes.c.recipe)
