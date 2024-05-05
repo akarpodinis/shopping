@@ -11,16 +11,10 @@ from app.infra.recipes import (
     DuplicateRecipeError, RecipeDoesNotExistError, add, all, editable, update
 )
 from app.routers import check_id
-from app.routers.responses import UUIDJSONResponse
 
 router = APIRouter(prefix='/recipes')
 
 templates = Jinja2Templates(directory='app/resources/templates/recipes')
-
-
-@router.get('')
-def list_ingredients() -> Response:
-    return UUIDJSONResponse(content=all())
 
 
 # Ordering matters here.  I want the router to check /recipes/new on GET before trying to

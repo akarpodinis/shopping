@@ -8,6 +8,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.infra import lists, quick, recipes
+from app.infra.lists import ArbitraryItem
 from app.routers import check_id
 
 router = APIRouter(prefix='/lists')
@@ -67,7 +68,7 @@ def add(date: Annotated[str, Form()],
     if include_quick_items:
         for quick_item in quick.current():
             arbitrary_items.append(
-                (quick_item.name, quick_item.aisle, quick_item.amount))
+                ArbitraryItem(quick_item.name, quick_item.aisle, quick_item.amount))
 
         quick.delete_all()
 

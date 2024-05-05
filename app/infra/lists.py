@@ -130,8 +130,15 @@ def add_recipe_items(list_id: UUID,
     )
 
 
+@dataclass
+class ArbitraryItem:
+    name: str
+    aisle: str
+    amount: float
+
+
 def add_arbitrary_items(list_id: UUID,
-                        arbitrary_items: list[tuple[str, str, float]],
+                        arbitrary_items: list[ArbitraryItem],
                         conn: Connectable) -> None:
     if not arbitrary_items:
         return
@@ -140,9 +147,9 @@ def add_arbitrary_items(list_id: UUID,
         insert(list_items), [
             {
                 'list': list_id,
-                'name': arbitrary_item[0],
-                'aisle': arbitrary_item[1],
-                'amount': arbitrary_item[2]
+                'name': arbitrary_item.name,
+                'aisle': arbitrary_item.aisle,
+                'amount': arbitrary_item.amount
             } for arbitrary_item in arbitrary_items]
     )
 
@@ -154,7 +161,7 @@ class NoItemsToMakeAListError(Exception):
 def add(date: datetime,
         recipe_scales: dict[UUID, float],
         included_ingredients: list[UUID],
-        arbitrary_items: list[tuple[str, str, float]]) -> UUID:
+        arbitrary_items: list[ArbitraryItem]) -> UUID:
     if not (recipe_scales or arbitrary_items):
         raise NoItemsToMakeAListError
 

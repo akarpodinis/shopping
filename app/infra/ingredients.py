@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from dataclasses import dataclass
 from uuid import UUID
 
 from psycopg.errors import UniqueViolation
@@ -8,17 +8,33 @@ from sqlalchemy.exc import IntegrityError
 from app.infra.db import engine, ingredients
 
 
-def all() -> list[dict[str, Any]]:
+@dataclass
+class Ingredient:
+    id: UUID
+    name: str
+    aisle: str
+    stocked: bool
+
+
+def all() -> list[Ingredient]:
     with engine.connect() as conn:
-        return [dict(ingredient) for ingredient
+        return [Ingredient(**ingredient) for ingredient
                 in conn.execute(ingredients.select()).mappings().all()]
 
 
-def one(id: UUID) -> Optional[dict[str, Any]]:
+class IngredientNotFoundError(Exception):
+    pass
+
+
+def one(id: UUID) -> Ingredient:
     with engine.connect() as conn:
         ingredient = conn.execute(
             select(ingredients).where(ingredients.c.id == id)).mappings().first()
-        return dict(ingredient) if ingredient else None
+
+        if not ingredient:
+            raise IngredientNotFoundError
+
+        return Ingredient(**ingredient)
 
 
 class DuplicateIngredientError(Exception):
@@ -65,45 +81,7 @@ def names_and_ids() -> tuple[list[str], list[UUID]]:
     return names, ids
 
 
-def new_template_configuration() -> dict[str, Any]:
-    return {
-        'fields': [
-            ingredients.c.name.name,
-            ingredients.c.aisle.name,
-            ingredients.c.stocked.name
-        ],
-        'types': [
-            'text', 'text', 'checkbox'
-        ],
-        'required': [
-            'required', 'required', ''
-        ]
-    }
-
-
-def edit_template_configuration(id: UUID) -> dict[str, Any]:
-    ingredient = one(id)
-
-    return {
-        'id': str(id),
-        'name': ingredient['name'],
-        'fields': [
-            ingredients.c.name.name,
-            ingredients.c.aisle.name,
-            ingredients.c.stocked.name
-        ],
-        'types': [
-            'text', 'text', 'checkbox'
-        ],
-        'existing': [
-            ingredient['name'],
-            ingredient['aisle'],
-            'checked' if ingredient['stocked'] else ''
-        ]
-    }
-
-
-def update(id: UUID, stocked: bool, name: str = None, aisle: str = None) -> dict[str, Any]:
+def update(id: UUID, stocked: bool, name: str = None, aisle: str = None) -> Ingredient:
     with engine.connect() as conn:
         try:
             values = {}
@@ -123,4 +101,4 @@ def update(id: UUID, stocked: bool, name: str = None, aisle: str = None) -> dict
             else:
                 raise
 
-        return dict(updated)
+        return Ingredient(**updated)
