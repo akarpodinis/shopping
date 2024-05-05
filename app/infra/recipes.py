@@ -60,6 +60,7 @@ def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[
                     ingredients_recipes.update().values(
                         amount=ingredient[1]
                     ).where(ingredients_recipes.c.ingredient == ingredient[0])
+                     .where(ingredients_recipes.c.recipe == id)
                 )
 
             conn.commit()
@@ -74,7 +75,7 @@ def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[
 class EditableIngredient:
     id: str
     name: str
-    amount: int
+    amount: float
 
 
 @dataclass
@@ -126,7 +127,7 @@ class DuplicateRecipeError(Exception):
     pass
 
 
-def add(name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, int]]) -> UUID:
+def add(name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, float]]) -> UUID:
     try:
         with engine.connect() as conn:
             # Insert the base recipe record, raising if there's a duplicate name

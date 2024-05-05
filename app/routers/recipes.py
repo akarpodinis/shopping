@@ -113,7 +113,7 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
         amounts = []
         for selected_id in selected_ids:
             try:
-                amount = int(form_dict[f'{selected_id}||amount'])
+                amount = float(form_dict[f'{selected_id}||amount'])
                 amounts.append((selected_id, amount))
             except ValueError as e:
                 return Response(content=f'Amount {e} should be an integer', status_code=422)

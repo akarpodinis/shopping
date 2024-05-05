@@ -62,7 +62,7 @@ def add(date: Annotated[str, Form()],
         # Ignore the whole arbitrary item row if the name is blank
         if not name:
             continue
-        arbitrary_items.append((name, arbitrary_aisles[index], int(arbitrary_amounts[index])))
+        arbitrary_items.append((name, arbitrary_aisles[index], float(arbitrary_amounts[index])))
 
     if include_quick_items:
         for quick_item in quick.current():
