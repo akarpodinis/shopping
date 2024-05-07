@@ -74,8 +74,6 @@ def add(date: Annotated[str, Form()],
             arbitrary_items.append(
                 ArbitraryItem(quick_item.name, quick_item.aisle, quick_item.amount))
 
-        quick.delete_all()
-
     try:
         added_list = lists.add(
             datetime.strptime(date, r'%Y-%m-%d'),
@@ -83,6 +81,10 @@ def add(date: Annotated[str, Form()],
             include_ingredients,
             arbitrary_items
         )
+        # This isn't the right way to do this, the request scope should manage when these items
+        # are deleted with a commit and a rollback and then I can remove the following check.
+        if include_quick_items:
+            quick.delete_all()
     except lists.NoItemsToMakeAListError:
         message = 'Pick some things to make a list'
         return RedirectResponse(f'/lists/new?message={escape(message)}', status_code=303)
