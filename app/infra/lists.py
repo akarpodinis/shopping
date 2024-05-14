@@ -244,7 +244,7 @@ def latest() -> list[List]:
         latest = conn.execute(
             select(lists)
             .where(
-                func.extract('day', lists.c.date) == func.extract('day', func.now())
+                lists.c.date == func.current_date()
             )
             .order_by(lists.c.date)
         ).mappings().all()
