@@ -41,12 +41,47 @@ div.sticky-heading {
     padding-bottom: 10px;
 }
 
-a:link, a:visited {
-    color: #d99a25;
+a {
+    border: 2px solid #d99a25;
+    padding: 0.2em 0.4em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    transition-duration: 100ms;
+    border-radius: 0.5em;
+    margin: 0.1em;
 }
 
-a:active, a:hover {
-    color: #2a5948;
+a:hover {
+    background-color: #2a5948;
+    border-color: #2a5948;
+    color: #f2f2f2;
+}
+
+input[type=submit], button[type=submit] {
+    background-color:#2a5948;
+    display:inline-block;
+    cursor:pointer;
+    color:#f2f2f2;
+    text-decoration:none;
+    border: 2px solid #d99a25;
+    padding: 0.2em 0.4em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    transition-duration: 100ms;
+    border-radius: 0.5em;
+    margin: 0.1em;
+}
+
+input[type=submit]:hover, button[type=submit]:hover {
+    border-width: 4px;
+}
+
+.multiple-submit-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1em;
 }
 
 .quick-status {
@@ -124,20 +159,6 @@ input[type=number] {
     text-transform: capitalize;
 }
 
-input[type=submit], button[type=submit] {
-    background-color:#2a5948;
-    border-radius:5px;
-    display:inline-block;
-    cursor:pointer;
-    color:#f2f2f2;
-    text-decoration:none;
-}
-
-.multiple-submit-buttons {
-    display: flex;
-    align-items: center;
-    gap: 1em;
-}
 
 @media only screen and (min-width: 600px) {
     html {
@@ -210,7 +231,6 @@ input[type=submit], button[type=submit] {
     margin: -1px;
     padding: 0;
     border: 0;
-
 }
 
 .check + label {
