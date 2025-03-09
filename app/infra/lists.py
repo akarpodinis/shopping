@@ -137,6 +137,9 @@ class ArbitraryItem:
     amount: float
 
 
+NewItem = ArbitraryItem
+
+
 def add_arbitrary_items(list_id: UUID,
                         arbitrary_items: list[ArbitraryItem],
                         conn: Connection) -> None:
@@ -152,6 +155,11 @@ def add_arbitrary_items(list_id: UUID,
                 'amount': arbitrary_item.amount
             } for arbitrary_item in arbitrary_items]
     )
+
+
+def append_new_items(list_id: UUID, new_items: list[NewItem]) -> None:
+    with engine.begin() as conn:
+        add_arbitrary_items(list_id, new_items, conn)
 
 
 class NoItemsToMakeAListError(Exception):
@@ -252,3 +260,14 @@ def latest() -> list[List]:
         ).mappings().all()
 
     return [List(**latest_list) for latest_list in latest]
+
+
+def update_date(id: UUID, new_date: datetime) -> None:
+    with engine.connect() as conn:
+        conn.execute(
+            lists.update().values(
+                date=new_date
+            ).where(lists.c.id == id)
+        )
+
+        conn.commit()

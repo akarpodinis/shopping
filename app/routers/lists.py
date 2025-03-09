@@ -7,8 +7,8 @@ from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.infra import lists, quick, recipes
-from app.infra.lists import ArbitraryItem
+from app.infra import aisles, lists, quick, recipes
+from app.infra.lists import ArbitraryItem, NewItem
 from app.routers import check_id
 
 router = APIRouter(prefix='/lists')
@@ -116,13 +116,28 @@ def confirm_stocked(request: Request,
     )
 
 
+@router.get('/{id}/update', dependencies=[Depends(check_id)])
+def add_to_list(request: Request, id: UUID) -> Response:
+    shopping_list = lists.for_shopping(id)
+    return templates.TemplateResponse(
+        request=request,
+        name='add_some_more_items.html',
+        context={
+            'aisle_names': aisles.all(),
+            'date': datetime.strftime(shopping_list.date, '%Y-%m-%d'),
+            'list': shopping_list,
+        }
+    )
+
+
 @router.get('/{id}/shopping', dependencies=[Depends(check_id)])
-def shopping(id: UUID, request: Request) -> Response:
+def shopping(id: UUID, request: Request, message: str = '') -> Response:
     shopping_list = lists.for_shopping(id)
     return templates.TemplateResponse(
         request=request,
         name='shopping.html',
         context={
+            'message': message,
             'date': datetime.strftime(shopping_list.date, '%A, %B %-m, %Y'),
             'list': shopping_list,
             'recipes_included': ', '.join(
@@ -130,6 +145,33 @@ def shopping(id: UUID, request: Request) -> Response:
             )
         }
     )
+
+
+@router.post('/{id}/add-more-items', dependencies=[Depends(check_id)])
+def add_more_items(request: Request,
+                   id: UUID,
+                   date: Annotated[str, Form()],
+                   names: Annotated[list[str], Form()] = [],
+                   aisles: Annotated[list[str], Form()] = [],
+                   amounts: Annotated[list[str], Form()] = []) -> Response:
+    new_items = []
+    for index, name in enumerate(names):
+        # Ignore the whole arbitrary item row if the name is blank
+        if not name:
+            continue
+        new_items.append(NewItem(
+            name,
+            aisles[index],
+            float(amounts[index])
+        ))
+
+    lists.append_new_items(id, new_items)
+    
+    lists.update_date(id, datetime.strptime(date, r'%Y-%m-%d'))
+
+    # Redirect to shopping list page
+    message = 'Successfully updated the list'
+    return RedirectResponse(f'/lists/{id}/shopping?message={escape(message)}', status_code=303)
 
 
 @router.get('/recent')

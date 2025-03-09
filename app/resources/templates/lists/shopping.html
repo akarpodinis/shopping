@@ -8,11 +8,10 @@
 <body>
     <div class="sticky-heading">
         <a href="/">Home</a>
-        <form class="sticky-heading" action="/lists/{{ list.id }}/add-to-list">
-            <button class="action-button" type="submit" name="submit_button" value="done">Add to this list</button>
-        </form>
+        <a href="/lists/{{ list.id }}/update">Add some more items</a>
     </div>
     <h1>List for {{date}}</h1>
+    <div class="quick-status">{{message}}</div>
     {% for aisle in list.aisles %}
     <div>
         <h2>{{aisle.name}}</h2>
