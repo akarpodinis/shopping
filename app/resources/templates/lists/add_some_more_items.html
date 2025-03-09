@@ -2,28 +2,17 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick list</title>
+    <title>Update a shopping list</title>
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
 </head>
 <body>
     <div class="sticky-heading"><a href="/">Home</a></div>
-    <h1>Quick List</h1>
+    <h1>Update a shopping list</h1>
     <div class="quick-status">{{message}}</div>
-    {% if current|length > 0 %}
-    <h2>Current quick items</h2>
-    <ul>
-        {% for item in current %}
-        <div class="input-line">
-            <li> <a href="/quick/{{item.id}}/delete">Delete</a> <label class="proper-name">{{item.amount}} {{item.name}} found in aisle {{item.aisle}}</label></li>
-            <br />
-        </div>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <div>You have no quick items</div>
-    {% endif %}
-    <h2>New quick items</h2>
-    <form action="/quick/list" method="POST">
+    <br />
+    <form action="/lists/{{ list.id }}/add-more-items" method="POST">
+        <div class="shopping-date"><label>Shopping on </label><input type="date" name="date" value="{{date}}" required /></div>
+        <br />
         {% for i in range(1, 5) %}
         <div>Name:<br /><input type="text" name="names" /><br />
             Aisle:<br /><input list="aisle-names" name="aisles" autocomplete="off" /><br />
@@ -34,7 +23,7 @@
             <option value="{{aisle_name}}"></option>
             {% endfor %}
         </datalist>
-        <div><input type="submit" value="Save for later"></div>
+        <div><input type="submit" value="Update"></div>
     </form>
 </body>
 </html>

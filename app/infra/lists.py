@@ -3,8 +3,8 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import func, label, or_, select
-from sqlalchemy.engine import Connectable
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.engine import Connection
 
 from app.infra.db import (
     engine, ingredients, ingredients_recipes, list_items, list_recipes, lists, recipes
@@ -59,7 +59,7 @@ def past_recipes(count: int) -> list[HistoricalList]:
 def add_recipe_items(list_id: UUID,
                      recipe_scales: dict[UUID, float],
                      included_ingredients: list[UUID],
-                     conn: Connectable) -> None:
+                     conn: Connection) -> None:
     if not recipe_scales:
         return
 
@@ -137,9 +137,12 @@ class ArbitraryItem:
     amount: float
 
 
+NewItem = ArbitraryItem
+
+
 def add_arbitrary_items(list_id: UUID,
                         arbitrary_items: list[ArbitraryItem],
-                        conn: Connectable) -> None:
+                        conn: Connection) -> None:
     if not arbitrary_items:
         return
 
@@ -152,6 +155,11 @@ def add_arbitrary_items(list_id: UUID,
                 'amount': arbitrary_item.amount
             } for arbitrary_item in arbitrary_items]
     )
+
+
+def append_new_items(list_id: UUID, new_items: list[NewItem]) -> None:
+    with engine.begin() as conn:
+        add_arbitrary_items(list_id, new_items, conn)
 
 
 class NoItemsToMakeAListError(Exception):
@@ -171,7 +179,7 @@ def add(date: datetime,
             lists.insert().values(
                 date=date
             ).returning(lists.c.id)
-        ).mappings().first().id
+        ).mappings().one().id
 
         # Create the list items from chosen recipes
         if recipe_scales:
@@ -206,9 +214,10 @@ class IncludedRecipe:
 
 @dataclass
 class ShoppingList:
+    id: UUID
     date: datetime
     aisles: list[ShoppingListAisle]
-    recipes_included: list[str]
+    recipes_included: list[IncludedRecipe]
 
 
 def for_shopping(id: UUID) -> ShoppingList:
@@ -217,9 +226,9 @@ def for_shopping(id: UUID) -> ShoppingList:
             select(list_items.c.name, list_items.c.aisle, list_items.c.amount)
             .join(list_items, list_items.c.list == id)
             .where(lists.c.id == id)).mappings().all()
-        list_date = conn.execute(
-            select(lists.c.date).where(lists.c.id == id)
-        ).mappings().one().date
+        shopping_list = conn.execute(
+            select(lists).where(lists.c.id == id)
+        ).mappings().one()
 
         aisles = {}
 
@@ -236,7 +245,8 @@ def for_shopping(id: UUID) -> ShoppingList:
                 list_recipes.select().where(list_recipes.c.list == id)).mappings().all():
             included_recipes += [IncludedRecipe(included_recipe.name, included_recipe.scale)]
 
-    return ShoppingList(list_date, list(aisles.values()), included_recipes)
+    return ShoppingList(shopping_list.id,
+                        shopping_list.date, list(aisles.values()), included_recipes)
 
 
 def latest() -> list[List]:
@@ -250,3 +260,14 @@ def latest() -> list[List]:
         ).mappings().all()
 
     return [List(**latest_list) for latest_list in latest]
+
+
+def update_date(id: UUID, new_date: datetime) -> None:
+    with engine.connect() as conn:
+        conn.execute(
+            lists.update().values(
+                date=new_date
+            ).where(lists.c.id == id)
+        )
+
+        conn.commit()

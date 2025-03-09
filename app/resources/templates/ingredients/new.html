@@ -11,9 +11,9 @@
     <div class="quick-status">{{message}}</div>
     <br />
     <form action="/ingredients" method="POST">
-        <div><label class="proper-word">Name</label><input type="text" name="name" required /></div>
+        <div><label class="proper-word">Name:</label><br /><input type="text" name="name" required /></div>
         <br />
-        <div><label class="proper-word">Aisle</label><input list="aisle_names" name="aisle" autocomplete="off" required /></div>
+        <div><label class="proper-word">Aisle:</label><br /><input list="aisle_names" name="aisle" autocomplete="off" required /></div>
         <br />
         <!-- 
             So I don't forget later, setting "checked" in-line in a tag with jinja isn't possible
