@@ -41,8 +41,13 @@ div.sticky-heading {
     padding-bottom: 10px;
 }
 
-a {
+form.sticky-heading {
+    display: inline;
+}
+
+input[type=submit], button[type=submit], a {
     border: 2px solid #d99a25;
+    background-color: inherit;
     padding: 0.2em 0.4em;
     text-align: center;
     text-decoration: none;
@@ -52,30 +57,10 @@ a {
     margin: 0.1em;
 }
 
-a:hover {
+input[type=submit]:hover, button[type=submit]:hover, a:hover {
     background-color: #2a5948;
     border-color: #2a5948;
     color: #f2f2f2;
-}
-
-input[type=submit], button[type=submit] {
-    background-color:#2a5948;
-    display:inline-block;
-    cursor:pointer;
-    color:#f2f2f2;
-    text-decoration:none;
-    border: 2px solid #d99a25;
-    padding: 0.2em 0.4em;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    transition-duration: 100ms;
-    border-radius: 0.5em;
-    margin: 0.1em;
-}
-
-input[type=submit]:hover, button[type=submit]:hover {
-    border-width: 4px;
 }
 
 .multiple-submit-buttons {
@@ -142,10 +127,11 @@ input[type=submit]:hover, button[type=submit]:hover {
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
+/* Hide the arrow buttons in <input type="number" /> */
 /* Firefox */
 input[type=number] {
   appearance: textfield;
@@ -165,6 +151,7 @@ input[type=number] {
         font-size: 15pt;
     }
     input, button {
+        font-size: 15pt;
         margin: 3px;
     }
 }
@@ -175,9 +162,7 @@ input[type=number] {
     }
 
     input, button {
-        height: 35px;
-        font-size: 12pt;
-        width: 98%;
+        font-size: 17pt;
     }
 }
 
