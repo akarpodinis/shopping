@@ -56,7 +56,7 @@ def new_quick(quick_items: Annotated[list[str], Form()],
 
         resolved_items.append(item)
         resolved_aisles.append(quick_aisles[index])
-        resolved_amounts.append(quick_amounts[index])
+        resolved_amounts.append(float(quick_amounts[index]))
 
     try:
         add(resolved_items, resolved_aisles, resolved_amounts)
