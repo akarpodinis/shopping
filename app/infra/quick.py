@@ -25,7 +25,7 @@ class QuickItem:
     added_at: datetime
 
 
-def add(items: list[str], aisles: list[str], amounts: list[int]) -> None:
+def add(items: list[str], aisles: list[str], amounts: list[float]) -> None:
     try:
         with engine.connect() as conn:
             conn.execute(
