@@ -138,7 +138,7 @@ def shopping(id: UUID, request: Request, message: str = '') -> Response:
         name='shopping.html',
         context={
             'message': message,
-            'date': datetime.strftime(shopping_list.date, '%A, %B %-m, %Y'),
+            'date': datetime.strftime(shopping_list.date, r'%A, %B %-d, %Y'),
             'list': shopping_list,
             'recipes_included': ', '.join(
                 f'{recipe.name} @ {recipe.scale}x' for recipe in shopping_list.recipes_included
