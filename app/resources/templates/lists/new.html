@@ -11,7 +11,7 @@
     <div class="quick-status">{{message}}</div>
     <br />
     <form action="/lists/confirm_stocked_and_arbitrary" method="POST">
-        <div class="shopping-date"><label>Shopping on </label><input type="date" name="date" required /></div>
+        <div class="shopping-date"><label>Shopping on </label><input type="date" name="date" value="{{today}}" required /></div>
         {% if quick_items|length > 0 %}
         <h2>Quick Items</h2>
         <div><a href="/quick/list">Edit the quick list first</a></div>

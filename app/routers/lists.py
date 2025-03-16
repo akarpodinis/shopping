@@ -2,6 +2,7 @@ from datetime import datetime
 from html import escape
 from typing import Annotated
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
@@ -39,6 +40,7 @@ def new_form(request: Request, message: str = '') -> Response:
         request=request,
         name='new.html',
         context={
+            'today': datetime.strftime(datetime.now(ZoneInfo('America/New_York')), r'%Y-%m-%d'),
             'message': message,
             'quick_items': current_summary,
             'recipes': recipes.all()
