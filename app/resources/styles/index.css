@@ -39,6 +39,8 @@ div.sticky-heading {
     background: linear-gradient(180deg, rgba(242,242,242,1) 90%, rgba(242,242,242,0) 100%);
     /* Padding, not margin, because I want more background visible below the div */
     padding-bottom: 10px;
+    z-index: 100;
+    margin-top: -10;
 }
 
 form.sticky-heading {

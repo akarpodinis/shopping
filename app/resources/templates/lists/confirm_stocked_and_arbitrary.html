@@ -35,9 +35,15 @@
         <h2>Need other things that aren't in a recipe?  Add them here.</h2>
         <br />
         {% for i in range(1, 5) %}
-        <div>Name:<input type="text" name="arbitrary_names" />Aisle:<input type="text" name="arbitrary_aisles" />Amount:<input type="text" inputmode="numeric" name="arbitrary_amounts"></div>
-        <br />
+        <div>Name:<br /><input type="text" name="arbitrary_names" /><br />
+            Aisle:<br /><input list="aisle-names" name="arbitrary_aisles" autocomplete="off" /><br />
+            Amount:<br /><input type="text" inputmode="numeric" name="arbitrary_amounts"></div><br />
         {% endfor %}
+        <datalist id="aisle-names">
+            {% for aisle_name in aisle_names %}
+            <option value="{{aisle_name}}"></option>
+            {% endfor %}
+        </datalist>
         <div><input type="submit" value="Include"></div>
     </form>
 </body>

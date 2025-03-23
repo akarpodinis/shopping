@@ -113,7 +113,8 @@ def confirm_stocked(request: Request,
             'recipes': included,
             'scales': [scales[index] for index in chosen_indexes],
             'include_quick_items': include_quick_items,
-            'stocked_ingredients': recipes.stocked(included)
+            'stocked_ingredients': recipes.stocked(included),
+            'aisle_names': aisles.all()
         }
     )
 
