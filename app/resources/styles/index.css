@@ -59,10 +59,25 @@ input[type=submit], button[type=submit], a {
     margin: 0.1em;
 }
 
+input[type=submit].destructive-button,
+button[type=submit].destructive-button,
+a.destructive-button {
+    background-color: #c07575;
+    border: 2px solid #d64040;
+    color: #472428;
+}
+
 input[type=submit]:hover, button[type=submit]:hover, a:hover {
     background-color: #2a5948;
     border-color: #2a5948;
     color: #f2f2f2;
+}
+
+input[type=submit].destructive-button:hover,
+button[type=submit].destructive-button:hover,
+a.destructive-button:hover {
+    background-color: #653238;
+    border: 2px solid #653238;
 }
 
 .multiple-submit-buttons {
@@ -83,6 +98,11 @@ input[type=submit]:hover, button[type=submit]:hover, a:hover {
 
 .recipe-ingredient-label {
     flex-grow: 2;
+}
+
+.edit-controls {
+    display: flex;
+    justify-content: space-between;
 }
 
 @media only screen and (max-width: 601px) {

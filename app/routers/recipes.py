@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.infra.ingredients import names_and_ids
 from app.infra.recipes import (
-    DuplicateRecipeError, RecipeDoesNotExistError, add, all, editable, update
+    DuplicateRecipeError, RecipeDoesNotExistError, add, all, delete, editable, update
 )
 from app.routers import check_id
 
@@ -121,3 +121,11 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
         message = f'Duplicate recipe called {name}'
 
     return RedirectResponse(f'/recipes/list?message={escape(message)}', status_code=303)
+
+@router.post('/{id}/delete')
+def delete_recipe(id: UUID) -> Response:
+    
+    delete(id)
+    
+    return RedirectResponse(f'/recipes/list?message={escape('Success, recipe deleted')}',
+                            status_code=303)

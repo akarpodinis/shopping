@@ -179,3 +179,10 @@ def stocked(ids: list[UUID]) -> list[dict[str, Any]]:
             .where(recipes.c.id.in_(ids))
         ).mappings().all()
     return [dict(stock) for stock in stocked]
+
+
+def delete(id: UUID) -> None:
+    with engine.begin() as conn:
+        conn.execute(
+            recipes.delete().where(recipes.c.id == id)
+        )

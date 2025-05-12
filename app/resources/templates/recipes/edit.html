@@ -8,7 +8,7 @@
 <body>
     <div class="sticky-heading"><a href="/">Home</a></div>
     <h1>{{name}}</h1>
-    <form action="/recipes/{{id}}/update" method="POST">
+    <form method="POST">
         <input type="hidden" name="ingredient_order" value="{{ingredient_order}}" />
         <p>Name <input type="text" name="name" pattern="^[^ ].+[^ ]$" value="{{name}}" required /></p>
         <p>Servings <input type="text" inputmode="numeric" min="1" name="servings" value="{{servings}}" required /></p>
@@ -24,7 +24,14 @@
         {% endfor %}
         <h2>Notes</h2>
         <div class="notes"><textarea class="notes-textarea" name="notes">{{notes}}</textarea></div>
-        <div><input type="submit" value="Update"></div>
+        <div class="edit-controls">
+            <button type="submit" formaction="/recipes/{{id}}/update" name="Update">
+                Update
+            </button>
+            <button class="destructive-button" type="submit" formaction="/recipes/{{id}}/delete" name="Delete">
+                Delete
+            </button>
+        </div>
     </form>
 </body>
 </html>
