@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.infra.ingredients import names_and_ids
 from app.infra.recipes import (
-    DuplicateRecipeError, RecipeDoesNotExistError, add, all, editable, update
+    DuplicateRecipeError, RecipeDoesNotExistError, add, all, delete, editable, update
 )
 from app.routers import check_id
 
@@ -76,8 +76,8 @@ def update_recipe(id: UUID,
                   servings: Annotated[int, Form()],
                   ingredient_order: Annotated[str, Form()],
                   is_routine: Annotated[bool, Form()] = False,
-                  notes: Annotated[str, Form()] = None,
-                  amounts: Annotated[list[float], Form()] = None) -> Response:
+                  notes: Annotated[str, Form()] = '',
+                  amounts: Annotated[list[float], Form()] = []) -> Response:
     ingredient_amounts = []
     for index, ingredient in enumerate(ingredient_order.split(',')):
         ingredient_amounts += [(UUID(ingredient), amounts[index])]
@@ -107,7 +107,10 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
         amounts = []
         for selected_id in selected_ids:
             try:
-                amount = float(form_dict[f'{selected_id}||amount'])
+                form_amount = form_dict[f'{selected_id}||amount']
+                if not isinstance(form_amount, str):
+                    raise TypeError('Strings only when POSTing a new recipe')
+                amount = float(form_amount)
                 amounts.append((selected_id, amount))
             except ValueError as e:
                 return Response(content=f'Amount {e} should be an integer', status_code=422)
@@ -118,3 +121,11 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
         message = f'Duplicate recipe called {name}'
 
     return RedirectResponse(f'/recipes/list?message={escape(message)}', status_code=303)
+
+@router.post('/{id}/delete')
+def delete_recipe(id: UUID) -> Response:
+    
+    delete(id)
+    
+    return RedirectResponse(f'/recipes/list?message={escape('Success, recipe deleted')}',
+                            status_code=303)

@@ -5,7 +5,7 @@ from uuid import UUID
 from psycopg.errors import UniqueViolation
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from app.infra.db import engine, ingredients, ingredients_recipes, recipe_notes, recipes
 
@@ -28,8 +28,8 @@ class RecipeDoesNotExistError(Exception):
     pass
 
 
-def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, int]],
-           notes: str) -> None:
+def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, float]],
+           notes: str | None) -> None:
     try:
         with engine.connect() as conn:
             # Update the base record
@@ -41,18 +41,25 @@ def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[
                 ).where(recipes.c.id == id)
             )
 
-            # Update notes with ON CONFLICT ... DO UPDATE
-            conn.execute(
-                insert(recipe_notes).values(
-                    recipe=id,
-                    notes=notes
-                ).on_conflict_do_update(
-                    index_elements=[recipe_notes.c.recipe],
-                    set_={
-                        recipe_notes.c.notes: notes
-                    }
+            # No notes?  Delete the record.
+            if not notes:
+                conn.execute(
+                    recipe_notes.delete().where(
+                        recipe_notes.c.recipe == id
+                    )
                 )
-            )
+            else:  # Update notes with ON CONFLICT ... DO UPDATE
+                conn.execute(
+                    insert(recipe_notes).values(
+                        recipe=id,
+                        notes=notes
+                    ).on_conflict_do_update(
+                        index_elements=[recipe_notes.c.recipe],
+                        set_={
+                            recipe_notes.c.notes: notes
+                        }
+                    )
+                )
 
             # Update the linked ingredients
             for ingredient in ingredients:
@@ -89,12 +96,15 @@ def editable(id: UUID) -> EditableRecipe:
         recipe = conn.execute(
             recipes.select()
             .where(recipes.c.id == id)
-        ).mappings().first()
+        ).mappings().one()
 
-        notes = conn.execute(
-            select(recipe_notes.c.notes)
-            .where(recipe_notes.c.recipe == id)
-        ).scalar()
+        try:
+            notes = conn.execute(
+                select(recipe_notes.c.notes)
+                .where(recipe_notes.c.recipe == id)
+            ).scalar_one()
+        except NoResultFound:
+            notes = 'None'
 
         """
         select i.name, i.stocked, ir.amount from recipes r
@@ -129,7 +139,7 @@ class DuplicateRecipeError(Exception):
 
 def add(name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, float]]) -> UUID:
     try:
-        with engine.connect() as conn:
+        with engine.begin() as conn:
             # Insert the base recipe record, raising if there's a duplicate name
             inserted = conn.execute(
                 recipes.insert().values(
@@ -139,7 +149,7 @@ def add(name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, f
                 ).returning(
                     recipes.c.id
                 )
-            ).mappings().first()
+            ).mappings().one()
 
             # Insert the join records with amounts included
             for ingredient in ingredients:
@@ -150,7 +160,6 @@ def add(name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, f
                         amount=ingredient[1]
                     )
                 )
-            conn.commit()
     except IntegrityError as e:
         if isinstance(e.orig, UniqueViolation):
             raise DuplicateRecipeError
@@ -170,3 +179,10 @@ def stocked(ids: list[UUID]) -> list[dict[str, Any]]:
             .where(recipes.c.id.in_(ids))
         ).mappings().all()
     return [dict(stock) for stock in stocked]
+
+
+def delete(id: UUID) -> None:
+    with engine.begin() as conn:
+        conn.execute(
+            recipes.delete().where(recipes.c.id == id)
+        )

@@ -3,7 +3,8 @@ import re
 
 import sqlalchemy as sa
 from sqlalchemy import (
-    Boolean, Column, DateTime, Float, Integer, String, Table, Text, UniqueConstraint
+    Boolean, Column, DateTime, Float, ForeignKeyConstraint, Integer, String, Table, Text,
+    UniqueConstraint
 )
 from sqlalchemy.dialects.postgresql import CITEXT, UUID
 
@@ -42,7 +43,13 @@ recipe_notes = Table(
     metadata,
     Column('recipe', UUID(as_uuid=True), nullable=False),
     Column('notes', Text),
-    UniqueConstraint('recipe', name='recipe_notes_recipe_key')
+    UniqueConstraint('recipe', name='recipe_notes_recipe_key'),
+    ForeignKeyConstraint(
+        ['recipe'],
+        ['recipes.id'],
+        'recipe_notes_recipe_fkey',
+        ondelete='CASCADE'
+    )
 )
 
 ingredients_recipes = Table(
