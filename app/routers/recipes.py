@@ -76,8 +76,8 @@ def update_recipe(id: UUID,
                   servings: Annotated[int, Form()],
                   ingredient_order: Annotated[str, Form()],
                   is_routine: Annotated[bool, Form()] = False,
-                  notes: Annotated[str, Form()] = None,
-                  amounts: Annotated[list[float], Form()] = None) -> Response:
+                  notes: Annotated[str, Form()] = '',
+                  amounts: Annotated[list[float], Form()] = []) -> Response:
     ingredient_amounts = []
     for index, ingredient in enumerate(ingredient_order.split(',')):
         ingredient_amounts += [(UUID(ingredient), amounts[index])]
@@ -107,7 +107,10 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
         amounts = []
         for selected_id in selected_ids:
             try:
-                amount = float(form_dict[f'{selected_id}||amount'])
+                form_amount = form_dict[f'{selected_id}||amount']
+                if not isinstance(form_amount, str):
+                    raise TypeError('Strings only when POSTing a new recipe')
+                amount = float(form_amount)
                 amounts.append((selected_id, amount))
             except ValueError as e:
                 return Response(content=f'Amount {e} should be an integer', status_code=422)
