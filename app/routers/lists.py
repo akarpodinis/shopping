@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from html import escape
 from typing import Annotated
 from uuid import UUID
@@ -143,6 +143,7 @@ def shopping(id: UUID, request: Request, message: str = '') -> Response:
             'message': message,
             'date': datetime.strftime(shopping_list.date, r'%A, %B %-d, %Y'),
             'list': shopping_list,
+            'allow_adding_items': shopping_list.date.day >= datetime.now(UTC).day,
             'recipes_included': ', '.join(
                 f'{recipe.name} @ {recipe.scale}x' for recipe in shopping_list.recipes_included
             )
