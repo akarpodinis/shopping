@@ -65,7 +65,7 @@ lists = Table(
     'lists',
     metadata,
     Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
-    Column('date', DateTime, nullable=True)
+    Column('date', DateTime(timezone=True), nullable=True)
 )
 
 list_recipes = Table(
