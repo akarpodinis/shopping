@@ -5,9 +5,9 @@ from app.routers import index, ingredients, lists, quick, recipes
 
 app = FastAPI()
 
-app.mount('/styles', StaticFiles(directory='app/resources/styles/'), name='styles')
+app.mount('/styles', StaticFiles(directory='app/resources/fonts-and-styles/styles/'), name='styles')
 app.mount('/favicon', StaticFiles(directory='app/resources/images/favicon'), name='favicon')
-app.mount('/fonts', StaticFiles(directory='app/resources/fonts/'), name='fonts')
+app.mount('/fonts', StaticFiles(directory='app/resources/fonts-and-styles/fonts/'), name='fonts')
 
 app.include_router(index.router)
 app.include_router(ingredients.router)
