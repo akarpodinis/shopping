@@ -1,5 +1,7 @@
 services:
     shopping:
+        tty: true
+        stdin_open: true
         image: shopping:latest
         container_name: shopping
         build: .
