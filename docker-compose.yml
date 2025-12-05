@@ -41,3 +41,4 @@ services:
             retries: 3
         ports:
             - "54320:5432"
+        command: ["postgres", "-c", "log_statement=all"]
