@@ -66,8 +66,8 @@ def new_ingredient(submit_button: Annotated[str, Form()],
 # So, to work around it, allow POST to /ingredients/{id} :(
 @router.post('/{id}', dependencies=[Depends(check_id)])
 def edit(id: UUID,
-         name: Annotated[str, Form()] = None,
-         aisle: Annotated[str, Form()] = None,
+         name: Annotated[str | None, Form()] = None,
+         aisle: Annotated[str | None, Form()] = None,
          stocked: Annotated[bool, Form()] = False) -> Response:
     try:
         update(id, stocked, name, aisle)
