@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>FDA Freshness Guidelines</title>
+        <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="sticky-heading"><a href="/">Home</a></div>
+        <h1>FDA Freshness Guidelines</h1>
+        <table>
+            <tr>
+                <th>Guideline</th>
+                <th>Duration (days)</th>
+            </tr>
+            {% for guideline in guidelines %}
+            <tr>
+                <td>{{guideline.name}}</td>
+                <td>{{guideline.duration_days}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

@@ -20,6 +20,12 @@
     </ol>
     <br />
     {% endif %}
+    {% if some_close_to_past_freshness %}
+    <div class="hint-text">
+        Some of your frozen items are within two weeks of losing their freshness.
+        Check the frozen items and plan a recipe soon!
+    </div>
+    {% endif %}
     <a href="/quick/list">Manage the quick list</a>
     <br />
     <a href="/lists/new">Make a new shopping list</a>
@@ -37,6 +43,14 @@
     <a href="/recipes/list">See and edit recipes</a>
     <br />
     <a href="/recipes/new">Add a recipe</a>
+
+    <h1>Manage the freezer</h1>
+    <a href="/freezer-items/list">See and edit freezer items</a>
+    <br />
+
+    <a href="/freezer-items/new">Add a freezer item</a>
+    <br />
+    <a href="/freshness-table">Check the FDA Freshness table</a>
     
 </body>
 </html>
