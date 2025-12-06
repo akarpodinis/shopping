@@ -141,7 +141,8 @@ def shopping(id: UUID, request: Request, message: str = '') -> Response:
         name='shopping.html',
         context={
             'message': message,
-            'date': datetime.strftime(shopping_list.date, r'%A, %B %-d, %Y'),
+            'formatted_date': datetime.strftime(shopping_list.date, r'%A, %B %-d, %Y'),
+            'raw_date': shopping_list.date.date(),
             'list': shopping_list,
             'allow_adding_items': shopping_list.date.day >= datetime.now(UTC).day,
             'recipes_included': ', '.join(

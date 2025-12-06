@@ -6,6 +6,7 @@ from app.routers import freezer_items, freshness_table, index, ingredients, list
 app = FastAPI()
 
 app.mount('/styles', StaticFiles(directory='app/resources/fonts-and-styles/styles/'), name='styles')
+app.mount('/scripts', StaticFiles(directory='app/resources/scripts'), name='scripts')
 app.mount('/favicon', StaticFiles(directory='app/resources/images/favicon'), name='favicon')
 app.mount('/fonts', StaticFiles(directory='app/resources/fonts-and-styles/fonts/'), name='fonts')
 

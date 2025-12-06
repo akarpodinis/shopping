@@ -2,8 +2,9 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Make a shopping list</title>
+    <title>Going shopping</title>
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+    <script src="{{ url_for('scripts', path='shopping-list.js') }}" defer></script>
 </head>
 <body>
     <div class="sticky-heading">
@@ -12,14 +13,15 @@
         <a href="/lists/{{ list.id }}/update">Add some more items</a>
         {% endif %}
     </div>
-    <h1>List for {{date}}</h1>
+    <h1>List for {{formatted_date}}</h1>
+    <p id="listID" hidden>{{list.id}}</p>
     <div class="quick-status">{{message}}</div>
     {% for aisle in list.aisles %}
     <div>
         <h2>{{aisle.name}}</h2>
         {% for item in aisle.items %}
         <div>
-            <input id="{{aisle.name}}-{{loop.index0}}" class="check" type="checkbox" name="{{field}}"/>
+            <input id="{{aisle.name}}-{{loop.index0}}" class="check" type="checkbox" name="{{field}}"  value="{{item.id}}"/>
             <label class="proper-word" for="{{aisle.name}}-{{loop.index0}}">{{item.amount}} {{item.name}}</label>
         </div>
         {% endfor %}
