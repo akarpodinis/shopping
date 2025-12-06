@@ -173,7 +173,7 @@ def add(date: datetime,
     if not (recipe_scales or arbitrary_items):
         raise NoItemsToMakeAListError
 
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         # Create the base list item
         list_id = conn.execute(
             lists.insert().values(
@@ -189,13 +189,12 @@ def add(date: datetime,
         if arbitrary_items:
             add_arbitrary_items(list_id, arbitrary_items, conn)
 
-        conn.commit()
-
     return list_id
 
 
 @dataclass
 class ShoppingListItem:
+    id: UUID
     name: str
     amount: float
 
@@ -223,7 +222,7 @@ class ShoppingList:
 def for_shopping(id: UUID) -> ShoppingList:
     with engine.connect() as conn:
         shopping_items = conn.execute(
-            select(list_items.c.name, list_items.c.aisle, list_items.c.amount)
+            select(list_items)
             .join(list_items, list_items.c.list == id)
             .where(lists.c.id == id)).mappings().all()
         shopping_list = conn.execute(
@@ -233,7 +232,7 @@ def for_shopping(id: UUID) -> ShoppingList:
         aisles = {}
 
         for item in shopping_items:
-            new_list_item = ShoppingListItem(item.name, item.amount)
+            new_list_item = ShoppingListItem(item.id, item.name, item.amount)
             if item.aisle not in aisles:
                 aisles[item.aisle] = ShoppingListAisle(item.aisle, [new_list_item])
             else:

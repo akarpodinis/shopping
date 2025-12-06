@@ -79,6 +79,7 @@ list_recipes = Table(
 list_items = Table(
     'list_items',
     metadata,
+    Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
     Column('list', UUID(as_uuid=True), nullable=False),
     Column('name', String, nullable=False),
     Column('aisle', String, nullable=False),

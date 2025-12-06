@@ -59,7 +59,7 @@ def add(date: Annotated[str, Form()],
         arbitrary_amounts: Annotated[list[str], Form()] = []) -> Response:
 
     # Filter empty arbitrary rows
-    arbitrary_items = []
+    arbitrary_items: list[ArbitraryItem] = []
 
     for index, name in enumerate(arbitrary_names):
         # Ignore the whole arbitrary item row if the name is blank
@@ -141,7 +141,8 @@ def shopping(id: UUID, request: Request, message: str = '') -> Response:
         name='shopping.html',
         context={
             'message': message,
-            'date': datetime.strftime(shopping_list.date, r'%A, %B %-d, %Y'),
+            'formatted_date': datetime.strftime(shopping_list.date, r'%A, %B %-d, %Y'),
+            'raw_date': shopping_list.date.date(),
             'list': shopping_list,
             'allow_adding_items': shopping_list.date.day >= datetime.now(UTC).day,
             'recipes_included': ', '.join(
@@ -158,7 +159,7 @@ def add_more_items(request: Request,
                    names: Annotated[list[str], Form()] = [],
                    aisles: Annotated[list[str], Form()] = [],
                    amounts: Annotated[list[str], Form()] = []) -> Response:
-    new_items = []
+    new_items: list[NewItem] = []
     for index, name in enumerate(names):
         # Ignore the whole arbitrary item row if the name is blank
         if not name:
