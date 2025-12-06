@@ -59,7 +59,7 @@ def add(date: Annotated[str, Form()],
         arbitrary_amounts: Annotated[list[str], Form()] = []) -> Response:
 
     # Filter empty arbitrary rows
-    arbitrary_items = []
+    arbitrary_items: list[ArbitraryItem] = []
 
     for index, name in enumerate(arbitrary_names):
         # Ignore the whole arbitrary item row if the name is blank
@@ -159,7 +159,7 @@ def add_more_items(request: Request,
                    names: Annotated[list[str], Form()] = [],
                    aisles: Annotated[list[str], Form()] = [],
                    amounts: Annotated[list[str], Form()] = []) -> Response:
-    new_items = []
+    new_items: list[NewItem] = []
     for index, name in enumerate(names):
         # Ignore the whole arbitrary item row if the name is blank
         if not name:
