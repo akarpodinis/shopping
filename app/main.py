@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import index, ingredients, lists, quick, recipes
+from app.routers import freezer_items, freshness_table, index, ingredients, lists, quick, recipes
 
 app = FastAPI()
 
@@ -14,3 +14,5 @@ app.include_router(ingredients.router)
 app.include_router(quick.router)
 app.include_router(lists.router)
 app.include_router(recipes.router)
+app.include_router(freezer_items.router)
+app.include_router(freshness_table.router)

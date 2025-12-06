@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Frozen Item</title>
+    <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+</head>    
+<body>
+    <div class="sticky-heading"><a href="/">Home</a></div>
+    <h1>Editing {{item.name}}</h1>
+    <div class="quick-status">{{message}}</div>
+    <form action="/freezer-items" method="POST">
+        <div><label class="proper-word">Name:</label><br /><input type="text" name="name" value="{{item.name}}" required /></div>
+        <br />
+        <div><label class="proper-word">Amount:</label><br /><input type="text" inputmode="numeric" min="1" name="amount" value="{{item.amount}}" required /></div>
+        <br />
+        <div><label class="proper-word">FDA Freshness guideline:</label>
+            <br />
+            <select name="fda_item" required>
+                {% for guideline in guidelines %}
+                    {% if item.freshness_id == guideline.id %}
+                        <option value="{{guideline.id}}" selected>{{guideline.name}} ({{guideline.duration_days}} days)</option>
+                    {% else %}
+                        <option value="{{guideline.id}}">{{guideline.name}} ({{guideline.duration_days}} days)</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="hint-text">Start typing to see a list of available FDA Freshness guidelines.</div>
+        <br />
+        <div><label class="shopping-date">Stored on:</label><input type="date" name="stored_on" value="{{item.added_at.date()}}" required /></div>
+        <br />
+        <div><label class="proper-word">Bag ID:</label><br /><input type="text" name="bag_id" value="{{item.freezer_bag_id}}"/></div>
+        <div class="hint-text">Provide a bag ID if you're returning a bag to the freezer, otherwise leave this blank and you'll get an autmatically-generated one.</div>
+        <br />
+        <div class="edit-controls">
+            <button type="submit" formaction="/freezer-items/{{item.id}}/update" name="Update">
+                Update
+            </button>
+            <button class="destructive-button" type="submit" formaction="/freezer-items/{{item.id}}/delete" name="Delete">
+                Delete
+            </button>
+        </div>
+    </form>
+</body>
+</html>

@@ -95,3 +95,35 @@ quick_items = Table(
     Column('added_at', DateTime, nullable=True),
     UniqueConstraint('name', name='quick_items_name_key')
 )
+
+freezer_items = Table(
+    'freezer_items',
+    metadata,
+    Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
+    Column('name', CITEXT, nullable=False),
+    Column('freezer_bag_id', CITEXT, nullable=False, unique=True),
+    Column('amount', Float, nullable=False, default=0),
+    Column('added_at', DateTime, nullable=True),
+    Column('freshness_id', UUID(as_uuid=True), nullable=False),
+    ForeignKeyConstraint(
+        ['freshness_id'],
+        ['freezer_freshness.id'],
+        'freezer_items_id_freezer_freshness_id_fkey'
+    )
+)
+
+freezer_freshness = Table(
+    'freezer_freshness',
+    metadata,
+    Column('id', UUID(as_uuid=True), server_default=new_uuid, primary_key=True),
+    Column('name', CITEXT, nullable=False),
+    Column('duration_days', Integer, nullable=False),
+)
+
+"""
+Freezer item plan
+* Add items in the freezer, choose expected CDC freshness duration based on item type
+* Server gives a simple alphanumeric bag ID to write on the storage bag
+* Delete freezer items when they're removed
+* Show food that is reaching the end of its quality about two weeks before the stored freshness when making a list
+"""

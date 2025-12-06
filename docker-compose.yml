@@ -1,5 +1,7 @@
 services:
     shopping:
+        tty: true
+        stdin_open: true
         image: shopping:latest
         container_name: shopping
         build: .
@@ -39,3 +41,4 @@ services:
             retries: 3
         ports:
             - "54320:5432"
+        command: ["postgres", "-c", "log_statement=all"]
