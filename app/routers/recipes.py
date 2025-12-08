@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.infra.ingredients import names_and_ids
 from app.infra.recipes import (
-    DuplicateRecipeError, RecipeDoesNotExistError, add, all, delete, editable, update
+    DuplicateRecipeError, IngredientAmounts, RecipeDoesNotExistError, add, all, delete, editable, update
 )
 from app.routers import check_id
 
@@ -78,7 +78,7 @@ def update_recipe(id: UUID,
                   is_routine: Annotated[bool, Form()] = False,
                   notes: Annotated[str, Form()] = '',
                   amounts: Annotated[list[float], Form()] = []) -> Response:
-    ingredient_amounts = []
+    ingredient_amounts: list[IngredientAmounts] = []
     for index, ingredient in enumerate(ingredient_order.split(',')):
         ingredient_amounts += [(UUID(ingredient), amounts[index])]
 
@@ -104,7 +104,7 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
         selected_ids = [
             UUID(key.split('||')[0]) for key in form_dict.keys() if 'selected' in key
         ]
-        amounts = []
+        amounts: list[IngredientAmounts] = []
         for selected_id in selected_ids:
             try:
                 form_amount = form_dict[f'{selected_id}||amount']
