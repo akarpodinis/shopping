@@ -9,8 +9,11 @@
     <div class="sticky-heading"><a href="/">Home</a></div>
     <h1>New Recipe</h1>
     <form action="/recipes" method="POST">
-        <p>Name <input type="text" name="name" pattern="^[^ ].+[^ ]$" required /></p>
-        <p>Servings <input type="text" inputmode="numeric" min="1" name="servings" value="1" required /></p>
+        <div><label class="proper-word">Name:</label><br /><input type="text" name="name" pattern="^[^ ].+[^ ]$" required /></div>
+        <br />
+        <label class="proper-word">Servings:</label><br /><input type="number" inputmode="numeric" min="1" name="servings" value="1" required /></div>
+        <br />
+        <br />
         <div class="input-line">
             <input id="routine-check" class="check" type="checkbox" name="is_routine" {{already_routine}}/>
             <label class="proper-word-for-status" for="routine-check">Routine</label>
@@ -20,7 +23,7 @@
         <div class="input-line">
             <input id="{{loop.index0}}" class="check" type="checkbox" name="{{ids[loop.index0]}}||selected" />
             <label class="recipe-name-label" for="{{loop.index0}}">{{name}}</label>
-            <input class="check-and-scale-scale-text" type="text" inputmode="numeric" name="{{ids[loop.index0]}}||amount" /><label class="recipe-name-label">Amount</label>
+            <input class="check-and-scale-scale-text" type="number" step="0.1" inputmode="numeric" min="1.0" name="amounts" />
         </div>
         <br />
         {% endfor %}

@@ -28,7 +28,10 @@ class RecipeDoesNotExistError(Exception):
     pass
 
 
-def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, float]],
+IngredientAmounts = tuple[UUID, float]
+
+
+def update(id: UUID, name: str, routine: bool, servings: int, ingredients: list[IngredientAmounts],
            notes: str | None) -> None:
     try:
         with engine.connect() as conn:
@@ -137,7 +140,7 @@ class DuplicateRecipeError(Exception):
     pass
 
 
-def add(name: str, routine: bool, servings: int, ingredients: list[tuple[UUID, float]]) -> UUID:
+def add(name: str, routine: bool, servings: int, ingredients: list[IngredientAmounts]) -> UUID:
     try:
         with engine.begin() as conn:
             # Insert the base recipe record, raising if there's a duplicate name
