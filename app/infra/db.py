@@ -94,7 +94,7 @@ quick_items = Table(
     Column('aisle', String, nullable=False),
     Column('amount', Float, nullable=False, default=0),
     Column('added_at', DateTime, nullable=True),
-    UniqueConstraint('name', name='quick_items_name_key')
+    UniqueConstraint('name', 'aisle', name='quick_items_name_aisle_key')
 )
 
 freezer_items = Table(
