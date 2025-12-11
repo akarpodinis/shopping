@@ -88,8 +88,7 @@ def add_recipe_items(list_id: UUID,
     group by i.id, i.name, i.aisle, ir.amount, i.stocked
     order by i.aisle desc;
     """
-    desired_ingredients = {}
-    resolved_ingredients = []
+    resolved_ingredients: list[RowMapping] = []
     for recipe in recipe_scales.keys():
         resolved_ingredients += conn.execute(
             select(
@@ -111,6 +110,7 @@ def add_recipe_items(list_id: UUID,
         ).mappings().all()
 
     # Combine the ingredient amounts by ID
+    desired_ingredients: dict[UUID, dict[str, str | float]] = {}
     for resolved_ingredient in resolved_ingredients:
         ingredient = dict(resolved_ingredient)
         if ingredient['id'] in desired_ingredients:
@@ -229,7 +229,7 @@ def for_shopping(id: UUID) -> ShoppingList:
             select(lists).where(lists.c.id == id)
         ).mappings().one()
 
-        aisles = {}
+        aisles: dict[str, ShoppingListAisle] = {}
 
         for item in shopping_items:
             new_list_item = ShoppingListItem(item.id, item.name, item.amount)
