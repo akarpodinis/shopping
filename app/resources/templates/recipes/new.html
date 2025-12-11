@@ -23,7 +23,7 @@
         <div class="input-line">
             <input id="{{loop.index0}}" class="check" type="checkbox" name="{{ids[loop.index0]}}||selected" />
             <label class="recipe-name-label" for="{{loop.index0}}">{{name}}</label>
-            <input class="check-and-scale-scale-text" type="number" step="0.1" inputmode="numeric" min="1.0" name="amounts" />
+            <input class="check-and-scale-scale-text" type="number" step="0.1" inputmode="numeric" min="1.0" name="{{ids[loop.index0]}}||amount" />
         </div>
         <br />
         {% endfor %}
