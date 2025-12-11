@@ -1,8 +1,11 @@
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Iterator
 from uuid import UUID
 
 from psycopg.errors import UniqueViolation
+from sqlalchemy import Connection
 from sqlalchemy.exc import IntegrityError
 
 from app.infra.db import engine, quick_items
@@ -25,9 +28,23 @@ class QuickItem:
     added_at: datetime
 
 
-def add(items: list[str], aisles: list[str], amounts: list[float]) -> None:
+def add(items: list[str],
+        aisles: list[str],
+        amounts: list[float],
+        existing_conn: Connection | None = None) -> None:
+    # When adding items to the quick list from the shopping list I want to use the
+    # connection object from the deletion operation so we can roll back the delete if the
+    # re-add here fails.  Maintain data integrity or something.
+    if existing_conn:
+        @contextmanager
+        def conn_wrapper() -> Iterator[Connection]:
+            yield existing_conn
+        conn_manager = conn_wrapper
+    else:
+        conn_manager = engine.begin
+
     try:
-        with engine.connect() as conn:
+        with conn_manager() as conn:
             conn.execute(
                 quick_items.insert().values([
                     {
@@ -37,8 +54,6 @@ def add(items: list[str], aisles: list[str], amounts: list[float]) -> None:
                     } for index, item in enumerate(items)]
                 )
             )
-
-            conn.commit()
     except IntegrityError as e:
         if isinstance(e.orig, UniqueViolation):
             raise DuplicateQuickItemError

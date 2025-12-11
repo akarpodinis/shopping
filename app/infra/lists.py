@@ -1,11 +1,13 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import func, label, or_, select
+from sqlalchemy import RowMapping, func, label, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.engine import Connection
 
+from app.infra import quick
 from app.infra.db import (
     engine, ingredients, ingredients_recipes, list_items, list_recipes, lists, recipes
 )
@@ -88,8 +90,7 @@ def add_recipe_items(list_id: UUID,
     group by i.id, i.name, i.aisle, ir.amount, i.stocked
     order by i.aisle desc;
     """
-    desired_ingredients = {}
-    resolved_ingredients = []
+    resolved_ingredients: list[RowMapping] = []
     for recipe in recipe_scales.keys():
         resolved_ingredients += conn.execute(
             select(
@@ -111,6 +112,7 @@ def add_recipe_items(list_id: UUID,
         ).mappings().all()
 
     # Combine the ingredient amounts by ID
+    desired_ingredients: dict[UUID, dict[str, str | float]] = {}
     for resolved_ingredient in resolved_ingredients:
         ingredient = dict(resolved_ingredient)
         if ingredient['id'] in desired_ingredients:
@@ -229,7 +231,7 @@ def for_shopping(id: UUID) -> ShoppingList:
             select(lists).where(lists.c.id == id)
         ).mappings().one()
 
-        aisles = {}
+        aisles: dict[str, ShoppingListAisle] = {}
 
         for item in shopping_items:
             new_list_item = ShoppingListItem(item.id, item.name, item.amount)
@@ -238,7 +240,7 @@ def for_shopping(id: UUID) -> ShoppingList:
             else:
                 aisles[item.aisle].items += [new_list_item]
 
-        included_recipes = []
+        included_recipes: list[IncludedRecipe] = []
 
         for included_recipe in conn.execute(
                 list_recipes.select().where(list_recipes.c.list == id)).mappings().all():
@@ -270,3 +272,26 @@ def update_date(id: UUID, new_date: datetime) -> None:
         )
 
         conn.commit()
+
+
+def move_inverse_to_quick_list(id: UUID, gathered_items: list[UUID], conn: Connection) -> None:
+    unchecked = conn.execute(
+        list_items.delete()
+        .where(list_items.c.id.not_in(gathered_items))
+        .where(list_items.c.list == id)
+        .returning(list_items.c.name, list_items.c.aisle, list_items.c.amount)
+    ).tuples().all()
+    
+    items, aisles, amounts = tuple(map(list, zip(*unchecked)))
+    
+    combined_items: dict[str, tuple[str, str, float]] = defaultdict(lambda: ('', '', 0.0))
+
+    # combine amounts for matching names and aisles
+    for index, item in enumerate(items):
+        key = f'{item[0].lower()}{aisles[index]}'
+        _, _, existing_amount = combined_items[key]
+        combined_items[key] = (item, aisles[index], existing_amount + amounts[index])
+
+    # save the combined quick items
+    final_items, final_aisles, final_amounts = tuple(map(list, zip(*combined_items.values())))
+    quick.add(final_items, final_aisles, final_amounts)

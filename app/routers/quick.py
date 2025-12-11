@@ -47,9 +47,9 @@ def new_quick(quick_items: Annotated[list[str], Form()],
               quick_aisles: Annotated[list[str], Form()],
               quick_amounts: Annotated[list[str], Form()],
               request: Request) -> Response:
-    resolved_items = []
-    resolved_aisles = []
-    resolved_amounts = []
+    resolved_items: list[str] = []
+    resolved_aisles: list[str] = []
+    resolved_amounts: list[float] = []
     for index, item in enumerate(quick_items):
         if not item:
             continue
