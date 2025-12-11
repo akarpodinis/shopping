@@ -9,7 +9,8 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.infra import aisles, lists, quick, recipes
-from app.infra.lists import ArbitraryItem, NewItem
+from app.infra.db import engine
+from app.infra.lists import ArbitraryItem, NewItem, move_inverse_to_quick_list
 from app.routers import check_id
 
 router = APIRouter(prefix='/lists')
@@ -177,6 +178,30 @@ def add_more_items(request: Request,
     # Redirect to shopping list page
     message = 'Successfully updated the list'
     return RedirectResponse(f'/lists/{id}/shopping?message={escape(message)}', status_code=303)
+
+
+@router.post('/{id}/send-to-quick-list', dependencies=[Depends(check_id)])
+async def return_to_quick_list(id: UUID, request: Request) -> Response:
+    # Paired identical UUIDs from the form
+    gathered_items: list[UUID] = []
+    for pair in await request.form():
+        gathered_items.append(UUID(pair))
+    
+    if not gathered_items:
+        return RedirectResponse(
+            f'/lists/{id}/shopping?message={escape('Nothing to move')}', status_code=303
+        )
+
+    
+    # Delete from the shopping list the items not in the incoming list, returning the deleted names,
+    # aisles and amounts to quick items, then send items to the quick list
+    with engine.begin() as conn:
+        move_inverse_to_quick_list(id, gathered_items, conn)
+    
+    # Redirect to the current list page to refresh the data.
+    return RedirectResponse(
+        f'/lists/{id}/shopping?message={escape('Done moving to the quick list')}', status_code=303
+    )
 
 
 @router.get('/recent')
