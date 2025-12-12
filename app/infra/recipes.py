@@ -3,11 +3,11 @@ from typing import Any
 from uuid import UUID
 
 from psycopg.errors import UniqueViolation
-from sqlalchemy import select
+from sqlalchemy import label, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
-from app.infra.db import engine, ingredients, ingredients_recipes, recipe_notes, recipes
+from app.infra.db import engine, ingredients, ingredients_recipes, quick_items, recipe_notes, recipes
 
 
 @dataclass
@@ -189,3 +189,54 @@ def delete(id: UUID) -> None:
         conn.execute(
             recipes.delete().where(recipes.c.id == id)
         )
+
+
+@dataclass
+class RecipeIngredientForTransfer:
+    id: UUID
+    name: str
+    stocked: bool
+    amount: float
+
+
+def all_ingredients(id: UUID) -> list[RecipeIngredientForTransfer]:
+    with engine.connect() as conn:
+        ingredients_for_quick_list = conn.execute(
+            select(
+                ingredients.c.id,
+                ingredients.c.name,
+                ingredients.c.stocked,
+                label('amount', ingredients_recipes.c.amount * 1.2)
+            )
+            .join(ingredients_recipes, ingredients_recipes.c.ingredient == ingredients.c.id)
+            .where(ingredients_recipes.c.recipe == id)
+        ).mappings().all()
+        
+        return [RecipeIngredientForTransfer(**ingredient) for ingredient in ingredients_for_quick_list]
+
+
+def send_to_quick_list(id: UUID, recipe_ingredients: list[UUID], scale: float) -> None:
+    with engine.begin() as conn:
+        for ingredient in recipe_ingredients:
+            ins_stmt = insert(quick_items).from_select(
+                ['name', 'aisle', 'amount'],
+                select(
+                    ingredients.c.name,
+                    ingredients.c.aisle,
+                    label('amount', ingredients_recipes.c.amount * scale)
+                )
+                .join(ingredients_recipes, ingredients_recipes.c.ingredient == ingredients.c.id)
+                .where(ingredients_recipes.c.recipe == id)
+                .where(ingredients_recipes.c.ingredient == ingredient)
+            )
+            conn.execute(
+                ins_stmt.on_conflict_do_update(
+                    index_elements=['name', 'aisle'],
+                    set_={
+                        quick_items.c.amount: (
+                            quick_items.c.amount + ins_stmt.excluded.amount
+                        )
+                    }
+                )
+            )
+        

@@ -8,7 +8,8 @@ from fastapi.templating import Jinja2Templates
 
 from app.infra.ingredients import names_and_ids
 from app.infra.recipes import (
-    DuplicateRecipeError, IngredientAmounts, RecipeDoesNotExistError, add, all, delete, editable, update
+    DuplicateRecipeError, IngredientAmounts, RecipeDoesNotExistError, add, all, all_ingredients,
+    delete, editable, send_to_quick_list, update
 )
 from app.routers import check_id
 
@@ -122,6 +123,7 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
 
     return RedirectResponse(f'/recipes/list?message={escape(message)}', status_code=303)
 
+
 @router.post('/{id}/delete')
 def delete_recipe(id: UUID) -> Response:
     
@@ -129,3 +131,26 @@ def delete_recipe(id: UUID) -> Response:
     
     return RedirectResponse(f'/recipes/list?message={escape('Success, recipe deleted')}',
                             status_code=303)
+
+
+@router.post('/{id}/send-to-quick-list')
+def confirm_stocked_when_sending_to_quick_list(
+    id: UUID,
+    scale: Annotated[float, Form()],
+    include_ingredients: Annotated[list[UUID], Form()] = []
+) -> Response:
+    send_to_quick_list(id, include_ingredients, scale)
+    return RedirectResponse(f'/recipes/list?message={escape('Success, sent to quick list')}',
+                            status_code=303)
+
+
+@router.get('/{id}/prepare-to-send-to-quick-list')
+def send_check_stock_form(id: UUID, request: Request) -> Response:
+    return templates.TemplateResponse(
+            request=request,
+            name='check-stocked.html',
+            context={
+                'id': id,
+                'ingredients': all_ingredients(id)
+            }
+        )
