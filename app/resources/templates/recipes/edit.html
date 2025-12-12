@@ -6,7 +6,10 @@
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
 </head>
 <body>
-    <div class="sticky-heading"><a href="/">Home</a></div>
+    <div class="sticky-heading">
+        <a href="/">Home</a>
+        <a href="/recipes/{{id}}/prepare-to-send-to-quick-list">Send to Quick List</a>
+    </div>
     <h1>{{name}}</h1>
     <form method="POST">
         <input type="hidden" name="ingredient_order" value="{{ingredient_order}}" />

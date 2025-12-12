@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send to quick list</title>
+    <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
+</head>
+<body>
+    <div class="sticky-heading"><a href="/">Home</a></div>
+    <h1>Send to quick list</h1>
+    <form action="/recipes/{{id}}/send-to-quick-list" method="POST">
+        <div><label class="proper-word">Scale:</label><br /><input type="number" inputmode="numeric" min="1" step="0.1" name="scale" value="1" required /></div>
+        <!-- Add a scale input here, default to the recipe scale -->
+        <h2>Deselect items you've got in stock or don't want to add to the Quick List</h2>
+        {% for ingredient in ingredients %}
+        <div>
+            <input id="{{loop.index0}}" class="check" type="checkbox" name="include_ingredients" value="{{ingredient.id}}" checked/>
+            {% if ingredient.stocked %}
+            <label for="{{loop.index0}}">{{ingredient.name}} (stocked)</label>
+            {% else %}
+            <label for="{{loop.index0}}">{{ingredient.name}}</label>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <br />
+        <div><input type="submit" value="Send"></div>
+    </form>
+</body>
+</html>
