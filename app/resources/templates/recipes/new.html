@@ -11,8 +11,7 @@
     <form action="/recipes" method="POST">
         <div><label class="proper-word">Name:</label><br /><input type="text" name="name" pattern="^[^ ].+[^ ]$" required /></div>
         <br />
-        <label class="proper-word">Servings:</label><br /><input type="number" inputmode="numeric" min="1" name="servings" value="1" required /></div>
-        <br />
+        <div><label class="proper-word">Servings:</label><br /><input type="number" inputmode="numeric" min="1" name="servings" value="1" required /></div>
         <br />
         <div class="input-line">
             <input id="routine-check" class="check" type="checkbox" name="is_routine" {{already_routine}}/>
