@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
-from html import escape
 from typing import Annotated
+from urllib.parse import quote
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -90,7 +90,7 @@ def add(date: Annotated[str, Form()],
             quick.delete_all()
     except lists.NoItemsToMakeAListError:
         message = 'Pick some things to make a list'
-        return RedirectResponse(f'/lists/new?message={escape(message)}', status_code=303)
+        return RedirectResponse(f'/lists/new?message={quote(message)}', status_code=303)
 
     # Redirect to shopping list page
     return RedirectResponse(f'/lists/{added_list}/shopping', status_code=303)
@@ -177,7 +177,7 @@ def add_more_items(request: Request,
 
     # Redirect to shopping list page
     message = 'Successfully updated the list'
-    return RedirectResponse(f'/lists/{id}/shopping?message={escape(message)}', status_code=303)
+    return RedirectResponse(f'/lists/{id}/shopping?message={quote(message)}', status_code=303)
 
 
 @router.post('/{id}/send-to-quick-list', dependencies=[Depends(check_id)])
@@ -189,7 +189,7 @@ async def return_to_quick_list(id: UUID, request: Request) -> Response:
     
     if not gathered_items:
         return RedirectResponse(
-            f'/lists/{id}/shopping?message={escape('Nothing to move')}', status_code=303
+            f'/lists/{id}/shopping?message={quote('Nothing to move')}', status_code=303
         )
 
     
@@ -200,7 +200,7 @@ async def return_to_quick_list(id: UUID, request: Request) -> Response:
     
     # Redirect to the current list page to refresh the data.
     return RedirectResponse(
-        f'/lists/{id}/shopping?message={escape('Done moving to the quick list')}', status_code=303
+        f'/lists/{id}/shopping?message={quote('Done moving to the quick list')}', status_code=303
     )
 
 

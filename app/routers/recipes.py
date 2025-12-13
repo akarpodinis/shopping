@@ -1,5 +1,5 @@
-from html import escape
 from typing import Annotated
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Request, Response
@@ -89,7 +89,7 @@ def update_recipe(id: UUID,
     except DuplicateRecipeError:
         message = f'Duplicate recipe called {name}'
 
-    return RedirectResponse(f'/recipes/list?message={escape(message)}', status_code=303)
+    return RedirectResponse(f'/recipes/list?message={quote(message)}', status_code=303)
 
 
 @router.post('')
@@ -121,7 +121,7 @@ async def new_recipe(name: Annotated[str, Form()], servings: Annotated[int, Form
     except DuplicateRecipeError:
         message = f'Duplicate recipe called {name}'
 
-    return RedirectResponse(f'/recipes/list?message={escape(message)}', status_code=303)
+    return RedirectResponse(f'/recipes/list?message={quote(message)}', status_code=303)
 
 
 @router.post('/{id}/delete')
@@ -129,7 +129,7 @@ def delete_recipe(id: UUID) -> Response:
     
     delete(id)
     
-    return RedirectResponse(f'/recipes/list?message={escape('Success, recipe deleted')}',
+    return RedirectResponse(f'/recipes/list?message={quote('Success, recipe deleted')}',
                             status_code=303)
 
 
@@ -140,7 +140,7 @@ def confirm_stocked_when_sending_to_quick_list(
     include_ingredients: Annotated[list[UUID], Form()] = []
 ) -> Response:
     send_to_quick_list(id, include_ingredients, scale)
-    return RedirectResponse(f'/recipes/list?message={escape('Success, sent to quick list')}',
+    return RedirectResponse(f'/recipes/list?message={quote('Success, sent to quick list')}',
                             status_code=303)
 
 

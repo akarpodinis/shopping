@@ -1,6 +1,6 @@
 from datetime import date, datetime
-from html import escape
 from typing import Annotated
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Request, Response
@@ -58,7 +58,7 @@ def update_recipe(id: UUID,
     except freezer.DuplicateBagIDError:
         message = f'Duplicate freezer bag ID called {bag_id}'
 
-    return RedirectResponse(f'/freezer-items/list?message={escape(message)}', status_code=303)
+    return RedirectResponse(f'/freezer-items/list?message={quote(message)}', status_code=303)
 
 
 @router.post('')
@@ -78,7 +78,7 @@ def new_freezer_item(
     
     destination = 'list' if 'done' in submit_button else 'new'
 
-    return RedirectResponse(f'/freezer-items/{destination}?message={escape(message)}',
+    return RedirectResponse(f'/freezer-items/{destination}?message={quote(message)}',
                             status_code=303)
 
 
@@ -101,5 +101,5 @@ def edit_form(id: UUID, request: Request) -> Response:
 def delete_recipe(id: UUID) -> Response:
     freezer.delete(id)
     
-    return RedirectResponse(f'/freezer-items/list?message={escape('Freezer item deleted')}',
+    return RedirectResponse(f'/freezer-items/list?message={quote('Freezer item deleted')}',
                             status_code=303)
