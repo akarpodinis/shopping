@@ -1,5 +1,5 @@
-from html import escape
 from typing import Annotated
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Request, Response
@@ -58,7 +58,7 @@ def new_ingredient(submit_button: Annotated[str, Form()],
 
     destination = 'list' if 'done' in submit_button else 'new'
 
-    return RedirectResponse(f'/ingredients/{destination}?message={escape(message)}',
+    return RedirectResponse(f'/ingredients/{destination}?message={quote(message)}',
                             status_code=303)
 
 
@@ -75,7 +75,7 @@ def edit(id: UUID,
     except DuplicateIngredientError:
         message = f'Duplicate ingredient called {name}'
 
-    return RedirectResponse(f'/ingredients/list?message={escape(message)}', status_code=303)
+    return RedirectResponse(f'/ingredients/list?message={quote(message)}', status_code=303)
 
 
 @router.delete('/{id}', dependencies=[Depends(check_id)])

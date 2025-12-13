@@ -1,5 +1,5 @@
-from html import escape
 from typing import Annotated
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Request, Response
@@ -23,7 +23,7 @@ def delete_quick_item(id: UUID) -> Response:
     except QuickItemNotFoundError:
         message = 'Quick item already deleted'
 
-    return RedirectResponse(f'/quick/list?message={escape(message)}', status_code=303)
+    return RedirectResponse(f'/quick/list?message={quote(message)}', status_code=303)
 
 
 @router.get('/list')
