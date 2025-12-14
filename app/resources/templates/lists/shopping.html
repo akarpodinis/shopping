@@ -31,6 +31,18 @@
     {% endfor %}
     </form>
     <br />
+    {% if allow_deleting_list %}
+    <button class="destructive-button" type="submit" popovertarget="delete-confirmation" popovertargetaction="show">Delete this list</button>
+    <div id="delete-confirmation" popover>
+        <p>You sure about that?</p>
+        <div class="popover-button-container">
+            <form action="/lists/{{list.id}}/delete" method="POST">
+                <input class="destructive-button" type="submit" value="Yes" />
+            </form>
+            <button type="submit" popovertarget="delete-confirmation" popovertargetaction="hide">Never mind</button>
+        </div>
+    </div>
+    {% endif %}
     {% if recipes_included|length > 0 %}
     <h3>Recipes included</h3>
     <div class="quick-item-summary">{{recipes_included}}</div>

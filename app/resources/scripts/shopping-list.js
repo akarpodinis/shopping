@@ -51,7 +51,7 @@ async function pruneExpiredShoppingLists() {
 
             // Delete checked list data
             var curentListCheckedData = checkedData[listID] || {};
-            delete curentListCheckedData[listItemID];
+            delete curentListCheckedData[listID];
         }
     }
 
