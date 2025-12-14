@@ -76,6 +76,19 @@ def delete(id: UUID) -> QuickItem:
     return QuickItem(**deleted)
 
 
+def delete_some(ids: list[UUID], existing_conn: Connection | None = None) -> None:
+    if existing_conn:
+        @contextmanager
+        def conn_wrapper() -> Iterator[Connection]:
+            yield existing_conn
+        conn_manager = conn_wrapper
+    else:
+        conn_manager = engine.begin
+
+    with conn_manager() as conn:
+        conn.execute(quick_items.delete().where(quick_items.c.id.in_(ids)))
+
+
 def current() -> list[QuickItem]:
     with engine.connect() as conn:
         return [

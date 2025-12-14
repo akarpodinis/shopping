@@ -1,6 +1,8 @@
 from collections import defaultdict
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Iterator
 from uuid import UUID
 
 from sqlalchemy import RowMapping, func, label, or_, select
@@ -171,11 +173,20 @@ class NoItemsToMakeAListError(Exception):
 def add(date: datetime,
         recipe_scales: dict[UUID, float],
         included_ingredients: list[UUID],
-        arbitrary_items: list[ArbitraryItem]) -> UUID:
+        arbitrary_items: list[ArbitraryItem],
+        existing_conn: Connection | None = None) -> UUID:
     if not (recipe_scales or arbitrary_items):
         raise NoItemsToMakeAListError
+    
+    if existing_conn:
+        @contextmanager
+        def conn_wrapper() -> Iterator[Connection]:
+            yield existing_conn
+        conn_manager = conn_wrapper
+    else:
+        conn_manager = engine.begin
 
-    with engine.begin() as conn:
+    with conn_manager() as conn:
         # Create the base list item
         list_id = conn.execute(
             lists.insert().values(
@@ -274,6 +285,10 @@ def update_date(id: UUID, new_date: datetime) -> None:
         conn.commit()
 
 
+class NoItemsToSendToQuickList(Exception):
+    pass
+
+
 def move_inverse_to_quick_list(id: UUID, gathered_items: list[UUID], conn: Connection) -> None:
     unchecked = conn.execute(
         list_items.delete()
@@ -282,6 +297,9 @@ def move_inverse_to_quick_list(id: UUID, gathered_items: list[UUID], conn: Conne
         .returning(list_items.c.name, list_items.c.aisle, list_items.c.amount)
     ).tuples().all()
     
+    if not unchecked:
+        raise NoItemsToSendToQuickList
+
     items, aisles, amounts = tuple(map(list, zip(*unchecked)))
     
     combined_items: dict[str, tuple[str, str, float]] = defaultdict(lambda: ('', '', 0.0))
