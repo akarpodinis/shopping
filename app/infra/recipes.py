@@ -173,6 +173,9 @@ def add(name: str, routine: bool, servings: int, ingredients: list[IngredientAmo
 
 
 def stocked(ids: list[UUID]) -> list[dict[str, Any]]:
+    if not ids:
+        return []
+
     with engine.connect() as conn:
         stocked = conn.execute(
             select(ingredients.c.id, ingredients.c.name).distinct()
