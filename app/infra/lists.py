@@ -274,6 +274,10 @@ def update_date(id: UUID, new_date: datetime) -> None:
         conn.commit()
 
 
+class NoItemsToSendToQuickList(Exception):
+    pass
+
+
 def move_inverse_to_quick_list(id: UUID, gathered_items: list[UUID], conn: Connection) -> None:
     unchecked = conn.execute(
         list_items.delete()
@@ -282,6 +286,9 @@ def move_inverse_to_quick_list(id: UUID, gathered_items: list[UUID], conn: Conne
         .returning(list_items.c.name, list_items.c.aisle, list_items.c.amount)
     ).tuples().all()
     
+    if not unchecked:
+        raise NoItemsToSendToQuickList
+
     items, aisles, amounts = tuple(map(list, zip(*unchecked)))
     
     combined_items: dict[str, tuple[str, str, float]] = defaultdict(lambda: ('', '', 0.0))
