@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.infra import aisles, lists, quick, recipes
 from app.infra.db import engine
-from app.infra.lists import ArbitraryItem, NewItem, move_inverse_to_quick_list
+from app.infra.lists import ArbitraryItem, NewItem, delete, move_inverse_to_quick_list
 from app.routers import check_id
 
 router = APIRouter(prefix='/lists')
@@ -19,14 +19,15 @@ templates = Jinja2Templates(directory='app/resources/templates/lists')
 
 
 @router.get('/list')
-def list_lists(request: Request) -> Response:
+def list_lists(request: Request, message: str = '') -> Response:
     all_lists = lists.all()
 
     return templates.TemplateResponse(
         request=request,
         name='list.html',
         context={
-            'all_lists': all_lists
+            'all_lists': all_lists,
+            'message': message
         }
     )
 
@@ -146,6 +147,7 @@ def shopping(id: UUID, request: Request, message: str = '') -> Response:
             'raw_date': shopping_list.date.date(),
             'list': shopping_list,
             'allow_adding_items': shopping_list.date.day >= datetime.now(UTC).day,
+            'allow_deleting_list': shopping_list.date.day < datetime.now(UTC).day,
             'recipes_included': ', '.join(
                 f'{recipe.name} @ {recipe.scale}x' for recipe in shopping_list.recipes_included
             )
@@ -212,4 +214,12 @@ def recent(request: Request, count: int = 5) -> Response:
         context={
             'recipes': lists.past_recipes(count)
         }
+    )
+
+
+@router.post('/{id}/delete')
+def delete_list(id: UUID) -> Response:
+    delete(id)
+    return RedirectResponse(
+        f'/lists/list?message={quote('Success, deleted the list')}', status_code=303
     )

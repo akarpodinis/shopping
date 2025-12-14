@@ -295,3 +295,10 @@ def move_inverse_to_quick_list(id: UUID, gathered_items: list[UUID], conn: Conne
     # save the combined quick items
     final_items, final_aisles, final_amounts = tuple(map(list, zip(*combined_items.values())))
     quick.add(final_items, final_aisles, final_amounts)
+
+
+def delete(id: UUID) -> None:
+    with engine.begin() as conn:
+        conn.execute(
+            lists.delete().where(lists.c.id == id)
+        )
