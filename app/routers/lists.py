@@ -100,7 +100,7 @@ def add(date: Annotated[str, Form()],
 @router.post('/confirm_stocked_and_arbitrary')
 def confirm_stocked(request: Request,
                     date: Annotated[str, Form()],
-                    available: Annotated[list[UUID], Form()],
+                    available: Annotated[list[UUID], Form()] = [],
                     included: Annotated[list[UUID], Form()] = [],
                     scales: Annotated[list[float], Form()] = [],
                     include_quick_items: Annotated[bool, Form()] = False,
@@ -146,8 +146,8 @@ def shopping(id: UUID, request: Request, message: str = '') -> Response:
             'formatted_date': datetime.strftime(shopping_list.date, r'%A, %B %-d, %Y'),
             'raw_date': shopping_list.date.date(),
             'list': shopping_list,
-            'allow_adding_items': shopping_list.date.day >= datetime.now(UTC).day,
-            'allow_deleting_list': shopping_list.date.day < datetime.now(UTC).day,
+            'allow_adding_items': shopping_list.date.date() >= datetime.now(UTC).date(),
+            'allow_deleting_list': shopping_list.date.date() < datetime.now(UTC).date(),
             'recipes_included': ', '.join(
                 f'{recipe.name} @ {recipe.scale}x' for recipe in shopping_list.recipes_included
             )
