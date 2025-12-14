@@ -100,7 +100,7 @@ def add(date: Annotated[str, Form()],
 @router.post('/confirm_stocked_and_arbitrary')
 def confirm_stocked(request: Request,
                     date: Annotated[str, Form()],
-                    available: Annotated[list[UUID], Form()],
+                    available: Annotated[list[UUID], Form()] = [],
                     included: Annotated[list[UUID], Form()] = [],
                     scales: Annotated[list[float], Form()] = [],
                     include_quick_items: Annotated[bool, Form()] = False,
