@@ -73,7 +73,13 @@ list_recipes = Table(
     metadata,
     Column('list', UUID(as_uuid=True), nullable=False),
     Column('name', String, nullable=False),
-    Column('scale', Float, nullable=False, default=1.0)
+    Column('scale', Float, nullable=False, default=1.0),
+    ForeignKeyConstraint(
+        ['list'],
+        ['lists.id'],
+        'list_recipes_list_id_fkey',
+        ondelete='CASCADE'
+    )
 )
 
 list_items = Table(
@@ -83,7 +89,13 @@ list_items = Table(
     Column('list', UUID(as_uuid=True), nullable=False),
     Column('name', String, nullable=False),
     Column('aisle', String, nullable=False),
-    Column('amount', Float, nullable=False, default=0)
+    Column('amount', Float, nullable=False, default=0),
+    ForeignKeyConstraint(
+        ['list'],
+        ['lists.id'],
+        'list_items_list_id_fkey',
+        ondelete='CASCADE'
+    )
 )
 
 quick_items = Table(
