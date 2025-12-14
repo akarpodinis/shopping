@@ -6,7 +6,12 @@
     <link href="{{ url_for('styles', path='/index.css') }}" rel="stylesheet" />
 </head>
 <body>
-    <div class="sticky-heading"><a href="/">Home</a></div>
+    <div class="sticky-heading">
+        <a href="/">Home</a>
+        {% if current|length > 0 %}
+        <a href="/quick/confirm-turn-into-a-list">Turn into a list</a>
+        {% endif %}
+    </div>
     <h1>Quick List</h1>
     <div class="quick-status">{{message}}</div>
     {% if current|length > 0 %}

@@ -1,18 +1,67 @@
+from datetime import datetime
 from typing import Annotated
 from urllib.parse import quote
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.infra import aisles
-from app.infra.quick import DuplicateQuickItemError, QuickItemNotFoundError, add, current, delete
+from app.infra.db import engine
+from app.infra.lists import ArbitraryItem
+from app.infra.lists import add as add_list
+from app.infra.quick import (
+    DuplicateQuickItemError, QuickItemNotFoundError, add, current, delete, delete_some
+)
 from app.routers import check_id
 
 router = APIRouter(prefix='/quick')
 
-templates = Jinja2Templates(directory='app/resources/templates/lists')
+templates = Jinja2Templates(directory='app/resources/templates/quick')
+
+
+@router.get('/confirm-turn-into-a-list')
+def confirm_turn_into_list(request: Request) -> Response:
+    return templates.TemplateResponse(
+        request=request,
+        name='check-stocked.html',
+        context={
+            'today': datetime.strftime(datetime.now(ZoneInfo('America/New_York')), r'%Y-%m-%d'),
+            'items': current()
+        }
+    )
+
+
+@router.post('/turn-into-a-list')
+def turn_into_a_list(date: Annotated[str, Form()],
+                     include_items: Annotated[list[UUID], Form()] = []) -> Response:
+    if not include_items:
+        return RedirectResponse(
+            f'/quick/list?message={quote('No items selected')}',
+            status_code=303
+        )
+
+    current_quick_items = current()
+    
+    with engine.begin() as conn:
+        list_id = add_list(
+            datetime.strptime(date, r'%Y-%m-%d'),
+            {},
+            [],
+            [ArbitraryItem(item.name, item.aisle, item.amount)
+             for item in current_quick_items if item.id in include_items],
+            conn
+        )
+        
+        delete_some(include_items, conn)
+    
+    return RedirectResponse(
+        f'/lists/{list_id}/shopping?message={quote('Success, here\'s your list')}',
+        status_code=303
+    )
+
 
 
 @router.get('/{id}/delete', dependencies=[Depends(check_id)])

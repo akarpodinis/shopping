@@ -1,6 +1,8 @@
 from collections import defaultdict
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Iterator
 from uuid import UUID
 
 from sqlalchemy import RowMapping, func, label, or_, select
@@ -171,11 +173,20 @@ class NoItemsToMakeAListError(Exception):
 def add(date: datetime,
         recipe_scales: dict[UUID, float],
         included_ingredients: list[UUID],
-        arbitrary_items: list[ArbitraryItem]) -> UUID:
+        arbitrary_items: list[ArbitraryItem],
+        existing_conn: Connection | None = None) -> UUID:
     if not (recipe_scales or arbitrary_items):
         raise NoItemsToMakeAListError
+    
+    if existing_conn:
+        @contextmanager
+        def conn_wrapper() -> Iterator[Connection]:
+            yield existing_conn
+        conn_manager = conn_wrapper
+    else:
+        conn_manager = engine.begin
 
-    with engine.begin() as conn:
+    with conn_manager() as conn:
         # Create the base list item
         list_id = conn.execute(
             lists.insert().values(
