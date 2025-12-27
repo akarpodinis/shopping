@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.infra import aisles
+from app.infra import aisles, recipe_ingredients
 from app.infra.ingredients import (
     DuplicateIngredientError, IngredientNotFoundError, add, all, delete, one, update
 )
@@ -93,7 +93,8 @@ def edit_form(id: UUID, request: Request) -> Response:
             name='edit.html',
             context={
                 'ingredient': ingredient,
-                'aisle_names': aisles.all()
+                'aisle_names': aisles.all(),
+                'recipes_using': recipe_ingredients.recipes_using(id)
             }
         )
     except IngredientNotFoundError:
