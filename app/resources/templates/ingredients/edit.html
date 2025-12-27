@@ -8,28 +8,45 @@
 <body>
     <div class="sticky-heading"><a href="/">Home</a></div>
     <h1>Editing {{ingredient.name}}</h1>
-    <form action="/ingredients/{{ingredient.id}}" method="POST">
-        <div><label class="proper-word">Name</label><input type="text" name="name" value="{{ingredient.name}}" required /></div>
-        <br />
-        <div><label class="proper-word">Aisle</label><input list="aisle_names" name="aisle" autocomplete="off" value="{{ingredient.aisle}}" required /></div>
-        <br />
-        <!-- 
-            So I don't forget later, setting "checked" in-line in a tag with jinja isn't possible
-            so use control statements to insert a whole tag instead :(
-        -->
-        {% if ingredient.stocked %}
-        <input id="stocked-input" class="check" type="checkbox" name="stocked" checked />
-        {% else %}
-        <input id="stocked-input" class="check" type="checkbox" name="stocked" />
-        {% endif %}
-        <label class="proper-word-for-status" for="stocked-input">Stocked</label>
-        <br />
-        <datalist id="aisle_names">
-            {% for aisle_name in aisle_names %}
-            <option value="{{aisle_name}}"></option>
+    <div class="ingredient-edit-layout">
+        <div class="ingredient-edit-layout-left">
+            <form action="/ingredients/{{ingredient.id}}" method="POST">
+                <div><label class="proper-word">Name</label><input type="text" name="name" value="{{ingredient.name}}" required /></div>
+                <br />
+                <div><label class="proper-word">Aisle</label><input list="aisle_names" name="aisle" autocomplete="off" value="{{ingredient.aisle}}" required /></div>
+                <br />
+                <!-- 
+                    So I don't forget later, setting "checked" in-line in a tag with jinja isn't possible
+                    so use control statements to insert a whole tag instead :(
+                -->
+                <div>
+                {% if ingredient.stocked %}
+                <input id="stocked-input" class="check" type="checkbox" name="stocked" checked />
+                {% else %}
+                <input id="stocked-input" class="check" type="checkbox" name="stocked" />
+                {% endif %}
+                <label class="proper-word-for-status" for="stocked-input">Stocked</label>
+                </div>
+                <br />
+                <input type="submit" value="Update" />
+                <datalist id="aisle_names">
+                    {% for aisle_name in aisle_names %}
+                    <option value="{{aisle_name}}"></option>
+                    {% endfor %}
+                </datalist>
+            </form>
+        </div>
+        <div class="ingredient-edit-layout-right">
+            {% if recipes_using|length <= 0 %}
+            <h2>No recipes use this ingredient</h2>
+            {% else %}
+            <h2>Recipes using this ingredient</h2>
+            {% for recipe in recipes_using %}
+                <a class="" href="/recipes/{{recipe.id}}/edit">{{recipe.name}}</a>
+                <br />
             {% endfor %}
-        </datalist>
-        <input type="submit" value="Update" />
-    </form>
+            {% endif %}
+        </div>
+    </div>
 </body>
 </html>
