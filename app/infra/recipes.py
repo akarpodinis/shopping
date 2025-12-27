@@ -7,15 +7,10 @@ from sqlalchemy import label, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
-from app.infra.db import engine, ingredients, ingredients_recipes, quick_items, recipe_notes, recipes
-
-
-@dataclass
-class Recipe:
-    id: UUID
-    name: str
-    routine: bool
-    servings: int
+from app.infra import Recipe
+from app.infra.db import (
+    engine, ingredients, ingredients_recipes, quick_items, recipe_notes, recipes
+)
 
 
 def all() -> list[Recipe]:
