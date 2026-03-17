@@ -135,35 +135,32 @@ def add_recipe_items(list_id: UUID,
 
 
 @dataclass
-class ArbitraryItem:
+class NewItem:
     name: str
     aisle: str
     amount: float
 
 
-NewItem = ArbitraryItem
-
-
-def add_arbitrary_items(list_id: UUID,
-                        arbitrary_items: list[ArbitraryItem],
-                        conn: Connection) -> None:
-    if not arbitrary_items:
+def add_new_items(list_id: UUID,
+                 new_items: list[NewItem],
+                 conn: Connection) -> None:
+    if not new_items:
         return
 
     conn.execute(
         insert(list_items), [
             {
                 'list': list_id,
-                'name': arbitrary_item.name,
-                'aisle': arbitrary_item.aisle,
-                'amount': arbitrary_item.amount
-            } for arbitrary_item in arbitrary_items]
+                'name': new_item.name,
+                'aisle': new_item.aisle,
+                'amount': new_item.amount
+            } for new_item in new_items]
     )
 
 
 def append_new_items(list_id: UUID, new_items: list[NewItem]) -> None:
     with engine.begin() as conn:
-        add_arbitrary_items(list_id, new_items, conn)
+        add_new_items(list_id, new_items, conn)
 
 
 class NoItemsToMakeAListError(Exception):
@@ -173,9 +170,9 @@ class NoItemsToMakeAListError(Exception):
 def add(date: datetime,
         recipe_scales: dict[UUID, float],
         included_ingredients: list[UUID],
-        arbitrary_items: list[ArbitraryItem],
+        included_quick_items: list[NewItem],
         existing_conn: Connection | None = None) -> UUID:
-    if not (recipe_scales or arbitrary_items):
+    if not (recipe_scales or included_quick_items):
         raise NoItemsToMakeAListError
     
     if existing_conn:
@@ -198,9 +195,9 @@ def add(date: datetime,
         if recipe_scales:
             add_recipe_items(list_id, recipe_scales, included_ingredients, conn)
 
-        # Create the historical list arbitrary item information
-        if arbitrary_items:
-            add_arbitrary_items(list_id, arbitrary_items, conn)
+        # Create the historical list quick item information
+        if included_quick_items:
+            add_new_items(list_id, included_quick_items, conn)
 
     return list_id
 
