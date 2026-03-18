@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.infra import aisles, lists, quick, recipes
 from app.infra.db import engine
-from app.infra.lists import ArbitraryItem, NewItem, NoItemsToSendToQuickList, delete, move_inverse_to_quick_list
+from app.infra.lists import NewItem, NoItemsToSendToQuickList, delete, move_inverse_to_quick_list
 from app.routers import check_id
 
 router = APIRouter(prefix='/lists')
@@ -55,35 +55,21 @@ def add(date: Annotated[str, Form()],
         recipes: Annotated[list[UUID], Form()] = [],
         scales: Annotated[list[float], Form()] = [],
         include_quick_items: Annotated[bool, Form()] = False,
-        include_ingredients: Annotated[list[UUID], Form()] = [],
-        arbitrary_names: Annotated[list[str], Form()] = [],
-        arbitrary_aisles: Annotated[list[str], Form()] = [],
-        arbitrary_amounts: Annotated[list[str], Form()] = []) -> Response:
-
-    # Filter empty arbitrary rows
-    arbitrary_items: list[ArbitraryItem] = []
-
-    for index, name in enumerate(arbitrary_names):
-        # Ignore the whole arbitrary item row if the name is blank
-        if not name:
-            continue
-        arbitrary_items.append(ArbitraryItem(
-            name,
-            arbitrary_aisles[index],
-            float(arbitrary_amounts[index])
-        ))
+        include_ingredients: Annotated[list[UUID], Form()] = []) -> Response:
+    
+    quick_items: list[NewItem] = []
 
     if include_quick_items:
         for quick_item in quick.current():
-            arbitrary_items.append(
-                ArbitraryItem(quick_item.name, quick_item.aisle, quick_item.amount))
+            quick_items.append(
+                NewItem(quick_item.name, quick_item.aisle, quick_item.amount))
 
     try:
         added_list = lists.add(
             datetime.strptime(date, r'%Y-%m-%d'),
             dict(zip([recipe for recipe in recipes], [scale for scale in scales])),
             include_ingredients,
-            arbitrary_items
+            quick_items
         )
         # This isn't the right way to do this, the request scope should manage when these items
         # are deleted with a commit and a rollback and then I can remove the following check.
@@ -97,7 +83,7 @@ def add(date: Annotated[str, Form()],
     return RedirectResponse(f'/lists/{added_list}/shopping', status_code=303)
 
 
-@router.post('/confirm_stocked_and_arbitrary')
+@router.post('/confirm_stocked')
 def confirm_stocked(request: Request,
                     date: Annotated[str, Form()],
                     available: Annotated[list[UUID], Form()] = [],
@@ -108,7 +94,7 @@ def confirm_stocked(request: Request,
     chosen_indexes = [available.index(i) for i in included]
     return templates.TemplateResponse(
         request=request,
-        name='confirm_stocked_and_arbitrary.html',
+        name='confirm_stocked.html',
         context={
             'message': message,
             'date': date,

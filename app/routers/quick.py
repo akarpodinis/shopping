@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.infra import aisles
 from app.infra.db import engine
-from app.infra.lists import ArbitraryItem
+from app.infra.lists import NewItem
 from app.infra.lists import add as add_list
 from app.infra.quick import (
     DuplicateQuickItemError, QuickItemNotFoundError, add, current, delete, delete_some
@@ -50,7 +50,7 @@ def turn_into_a_list(date: Annotated[str, Form()],
             datetime.strptime(date, r'%Y-%m-%d'),
             {},
             [],
-            [ArbitraryItem(item.name, item.aisle, item.amount)
+            [NewItem(item.name, item.aisle, item.amount)
              for item in current_quick_items if item.id in include_items],
             conn
         )
